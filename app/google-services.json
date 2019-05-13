@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "302523121790",
+    "firebase_url": "https://acessobio-sample.firebaseio.com",
+    "project_id": "acessobio-sample",
+    "storage_bucket": "acessobio-sample.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:302523121790:android:de76cecab3846152",
+        "android_client_info": {
+          "package_name": "com.example.acessobiosample"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "302523121790-jhfg0dmnbcjj2krp1eoe9lqje7no1glr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCGSH98IN6a5f9jGtnB_UeneWH0fOfVlMA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "302523121790-jhfg0dmnbcjj2krp1eoe9lqje7no1glr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

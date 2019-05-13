@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:fillViewport="true"
+    android:background="@color/colorWhite"
+
+    >
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:weightSum="8"
+        android:paddingBottom="20dp"
+        >
+
+        <ImageView
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:layout_marginTop="10dp"
+            android:src="@mipmap/acessobio"
+            android:scaleType="centerInside"
+            android:layout_gravity="center_horizontal"
+            />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="8"
+            android:orientation="vertical"
+            android:layout_marginLeft="50dp"
+            android:layout_marginRight="50dp"
+            android:layout_marginTop="10dp"
+            >
+            <EditText
+                android:id="@+id/etEmail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Usuário"
+                android:textColorHint="@color/colorGray"
+                android:textColor="@color/colorGreyDark"
+                android:lines="1"
+                android:maxLines="1"
+                android:inputType="textCapCharacters"
+                android:textSize="15sp"
+                android:paddingTop="15dp"
+                android:paddingBottom="15dp"
+                />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp">
+                <EditText
+                    android:id="@+id/etSenha"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Senha"
+                    android:textColorHint="@color/colorGray"
+                    android:textColor="@color/colorGreyDark"
+                    android:paddingRight="60dp"
+                    android:lines="1"
+                    android:maxLines="1"
+                    android:inputType="textPassword"
+                    android:textSize="15sp"
+                    android:paddingTop="15dp"
+                    android:paddingBottom="15dp"
+                    android:imeOptions="actionGo"
+                    />
+                <TextView
+                    android:id="@+id/bt_tv_esqueceu_senha"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:layout_alignParentRight="true"
+                    android:text="Esqueci"
+                    android:layout_centerInParent="true"
+                    android:textColor="@color/colorGray"
+                    android:textSize="13sp"
+                    android:gravity="center"
+                    android:paddingRight="3dp"
+                    />
+            </RelativeLayout>
+
+
+            <!--<com.facebook.login.widget.LoginButton-->
+                <!--android:id="@+id/bt_acessar_fb"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--style="@style/FacebookLoginButton"-->
+                <!--/>-->
+            <Button
+                android:id="@+id/btEnter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Entrar"
+                android:background="@color/colorPrimary"
+                android:textColor="@android:color/white"
+                android:layout_marginTop="10dp"
+                android:textAllCaps="false"
+                android:textSize="17sp"
+                />
+
+
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

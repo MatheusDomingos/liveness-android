@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">AcessoBio Sample</string>
+
+    <string name="camera_error">Este dispositivo não suporta a API Camera 2.</string>
+
+    <string name="wait">Aguarde...</string>
+
+    <string name="error_field_required">Preencha este campo</string>
+    <string name="error_invalid_cpf">CPF informado é inválido</string>
+    <string name="error_invalid_email">E-mail informado é inválido</string>
+    <string name="error_invalid_celular">Celular informado é inválido</string>
+
+
+
+    <!-- Custom Dialog -->
+    <string name="dialog_default_title">Here\'s a message!</string>
+    <string name="dialog_ok">OK</string>
+    <string name="dialog_cancel">Cancel</string>
+    <string name="LOADING">Loading...</string>
+
+    <string name="yes">SIM</string>
+    <string name="understood">OK, ENTENDI</string>
+    <string name="no">NÃO</string>
+
+</resources>
