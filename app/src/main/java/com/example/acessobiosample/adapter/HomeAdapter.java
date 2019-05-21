@@ -3,6 +3,7 @@ package com.example.acessobiosample.adapter;
 import android.app.Activity;
 
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -10,10 +11,13 @@ import androidx.annotation.LayoutRes;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.acessobiosample.R;
+import com.example.acessobiosample.dto.Attachments;
 import com.example.acessobiosample.dto.GetProcessByUserResult;
 import com.example.acessobiosample.dto.Process;
 import com.example.acessobiosample.dto.Subject;
+import com.mikhaellopez.circularimageview.CircularImageView;
 import com.orhanobut.hawk.Hawk;
 
 import java.util.ArrayList;
@@ -56,9 +60,22 @@ public class HomeAdapter<TPI> extends BaseAdapter<TPI, HomeAdapter.ViewHolder> {
             }
         }
 
+        ArrayList<Attachments> attachments = process.getAttachments();
+
+        if(attachments.size() > 0) {
+
+            Attachments attObj = attachments.get(0);
+
+            Glide.with(activity).load("https://www2.acesso.io/seres/" + attObj.getUri()).fitCenter().into(holder.ivUser);
+
+        }
+
 
         holder.tvName.setText(name);
         holder.tvCPF.setText(subject.getCode());
+
+
+
 
         Integer status  = process.getStatus();
 
@@ -93,6 +110,7 @@ public class HomeAdapter<TPI> extends BaseAdapter<TPI, HomeAdapter.ViewHolder> {
         private TextView tvCPF;
         private TextView tvStatus;
         private TextView tvScore;
+        private CircularImageView ivUser;
 
 
         public ViewHolder(View itemView) {
@@ -103,6 +121,7 @@ public class HomeAdapter<TPI> extends BaseAdapter<TPI, HomeAdapter.ViewHolder> {
             tvCPF = ((TextView) itemView.findViewById(R.id.tvCPF));
             tvStatus = ((TextView) itemView.findViewById(R.id.tvStatus));
             tvScore = ((TextView) itemView.findViewById(R.id.tvScore));
+            ivUser = ((CircularImageView) itemView.findViewById(R.id.ivUser));
 
             //  tvCityUF = ((TextView) itemView.findViewById(R.id.tv_city_UF));
         }

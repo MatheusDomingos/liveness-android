@@ -1,6 +1,8 @@
 package com.example.acessobiosample.dto;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,5 +23,10 @@ public class Process {
 
     @SerializedName("Subject")
     private Subject Subject;
+
+    @SerializedName("Attachments")
+    private ArrayList<Attachments> Attachments;
+
+
 
 }
