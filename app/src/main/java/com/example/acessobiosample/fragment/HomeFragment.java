@@ -163,7 +163,7 @@ public class HomeFragment extends CustomFragment {
                 .enqueue(new Callback<GetAuthTokenResponse>() {
 
                     @Override
-                    public void onResponse(Call<GetAuthTokenResponse> call, Response<GetAuthTokenResponse> response) {
+                    public void onResponse(Call<GetAuthTokenResponse> call , Response<GetAuthTokenResponse> response) {
 
                         GetAuthTokenResponse body = response.body();
 
@@ -172,7 +172,7 @@ public class HomeFragment extends CustomFragment {
 
                             ServiceGenerator
                                     .createService(BioService.class, false)
-                                    .getProcesses()
+                                    .getProcesses(Hawk.get(SharedKey.NAME))
                                     .enqueue(new Callback<GetProcessByUserResponse>() {
 
                                         @Override

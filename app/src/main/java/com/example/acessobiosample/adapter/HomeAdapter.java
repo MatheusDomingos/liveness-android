@@ -3,6 +3,8 @@ package com.example.acessobiosample.adapter;
 import android.app.Activity;
 
 import android.view.View;
+
+
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -64,21 +66,21 @@ public class HomeAdapter<TPI> extends BaseAdapter<TPI, HomeAdapter.ViewHolder> {
 
         if(attachments.size() > 0) {
 
-            Attachments attObj = attachments.get(0);
 
-            Glide.with(activity).load("https://www2.acesso.io/seres/" + attObj.getUri()).fitCenter().into(holder.ivUser);
+            for(int i = 0; i < attachments.size(); i ++) {
+                Attachments attObj = attachments.get(i);
+                if(attObj.getName().equals("Foto do Cliente")) {
+                    Glide.with(activity).load("https://www2.acesso.io/seres/" + attObj.getUri()).fitCenter().into(holder.ivUser);
+                }
+
+            }
 
         }
-
 
         holder.tvName.setText(name);
         holder.tvCPF.setText(subject.getCode());
 
-
-
-
         Integer status  = process.getStatus();
-
 
         if(status == 2) {
             holder.tvStatus.setText("Em análise");
@@ -87,6 +89,16 @@ public class HomeAdapter<TPI> extends BaseAdapter<TPI, HomeAdapter.ViewHolder> {
         }else{
             holder.tvStatus.setText("Autenticado");
             holder.tvStatus.setBackgroundColor(ContextCompat.getColor(activity, R.color.colorGreen));
+        }
+
+        Integer liveness  = process.getLiveness();
+
+        if(liveness == 0) {
+            holder.tvLiveness.setText("Desligado");
+        }else if (liveness == 1){
+            holder.tvLiveness.setText("Aprovado");
+        }else if (liveness == 2){
+            holder.tvLiveness.setText("Reprovado");
         }
 
         if(process.getScore() > 0) {
@@ -110,6 +122,8 @@ public class HomeAdapter<TPI> extends BaseAdapter<TPI, HomeAdapter.ViewHolder> {
         private TextView tvCPF;
         private TextView tvStatus;
         private TextView tvScore;
+        private TextView tvLiveness;
+
         private CircularImageView ivUser;
 
 
@@ -121,6 +135,8 @@ public class HomeAdapter<TPI> extends BaseAdapter<TPI, HomeAdapter.ViewHolder> {
             tvCPF = ((TextView) itemView.findViewById(R.id.tvCPF));
             tvStatus = ((TextView) itemView.findViewById(R.id.tvStatus));
             tvScore = ((TextView) itemView.findViewById(R.id.tvScore));
+            tvLiveness = ((TextView) itemView.findViewById(R.id.tvLiveness));
+
             ivUser = ((CircularImageView) itemView.findViewById(R.id.ivUser));
 
             //  tvCityUF = ((TextView) itemView.findViewById(R.id.tv_city_UF));

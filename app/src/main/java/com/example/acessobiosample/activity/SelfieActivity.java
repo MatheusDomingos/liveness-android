@@ -609,7 +609,7 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
     private void faceInsert(String base64, String processId) {
         FaceInsertRequest request = new FaceInsertRequest();
         request.setImagebase64(base64);
-        request.setValidateLiveness(Hawk.get(SharedKey.LIVENESS, false));
+        request.setValidateLiveness(Hawk.get(SharedKey.LIVENESS, true));
 
         // Face Insert  ----------------------
         ServiceGenerator

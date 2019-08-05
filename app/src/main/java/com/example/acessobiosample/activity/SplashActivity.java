@@ -6,6 +6,7 @@ import android.os.Handler;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.crashlytics.android.Crashlytics;
 import com.example.acessobiosample.R;
 import com.example.acessobiosample.fragment.CustomFragment;
 import com.example.acessobiosample.fragment.HomeFragment;
@@ -13,12 +14,14 @@ import com.example.acessobiosample.fragment.LoginFragment;
 import com.example.acessobiosample.utils.enumetators.SharedKey;
 import com.google.firebase.FirebaseApp;
 import com.orhanobut.hawk.Hawk;
+import io.fabric.sdk.android.Fabric;
 
 public class SplashActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Fabric.with(this, new Crashlytics());
 
         setContentView(R.layout.activity_splash);
         Handler handle = new Handler();

@@ -27,8 +27,8 @@ public interface BioService {
     @GET("user/authToken")
     Call<GetAuthTokenResponse> getAuthToken();
 
-    @GET("process/ADMIN/list")
-    Call<GetProcessByUserResponse> getProcesses();
+    @GET("process/{user}/list")
+    Call<GetProcessByUserResponse> getProcesses(@Path("user") String user);
 
     @POST("process/create/{type}")
     @Headers({"Content-Type: application/json;charset=UTF-8"})

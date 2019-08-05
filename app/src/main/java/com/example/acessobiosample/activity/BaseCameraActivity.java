@@ -26,6 +26,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.Map;
 
 import retrofit2.Response;
 
@@ -102,7 +103,14 @@ public class BaseCameraActivity extends AppCompatActivity {
             JSONObject j = new JSONObject(response.errorBody().string());
             JSONObject error = j.getJSONObject("Error");
             String message = error.getString("Description");
+            Integer code = error.getInt("Code");
+
+            if(code == 511) {
+                message = "Liveness falhou";
+            }
+
             return message;
+
         } catch (JSONException ex) {
             Log.d(TAG, ex.toString());
             return null;

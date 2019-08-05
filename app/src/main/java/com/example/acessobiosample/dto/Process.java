@@ -21,6 +21,9 @@ public class Process {
     @SerializedName("Status")
     private int Status;
 
+    @SerializedName("Liveness")
+    private int Liveness;
+
     @SerializedName("Subject")
     private Subject Subject;
 

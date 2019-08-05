@@ -12,4 +12,7 @@ public class Attachments {
     @SerializedName("Uri")
     private String Uri;
 
+    @SerializedName("Name")
+    private String name;
+
 }
