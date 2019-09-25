@@ -68,6 +68,9 @@ public class HomeFragment extends CustomFragment {
         View v = inflater.inflate(R.layout.fragment_home, null);
 
 
+
+        Hawk.init(getActivity()).build();
+
         rvProcess = ((RecyclerView) v.findViewById(R.id.list_simple_view));
         TextView tv_no_results = ((TextView) v.findViewById(R.id.tv_no_results));
         btConfig = ((ImageButton) v.findViewById(R.id.btConfig));

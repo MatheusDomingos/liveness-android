@@ -82,7 +82,8 @@ public class Camera2Base extends BaseCameraActivity implements View.OnClickListe
     protected static final int BIOMETRY_IMAGE_WIDTH_MIN = 640;
     protected static final int BIOMETRY_IMAGE_HEIGHT_MIN = 360;
 
-    protected Size jpegCaptureSize = new Size(BIOMETRY_IMAGE_WIDTH, BIOMETRY_IMAGE_HEIGHT);
+    protected Size jpegCaptureSize = new Size(BIOMETRY_IMAGE_WIDTH,
+            BIOMETRY_IMAGE_HEIGHT);
 
     static {
         ORIENTATIONS.append(Surface.ROTATION_0, 90);
@@ -322,12 +323,13 @@ public class Camera2Base extends BaseCameraActivity implements View.OnClickListe
 
                     // CONTROL_AE_STATE can be null on some devices
                     Integer aeState = result.get(CaptureResult.CONTROL_AE_STATE);
+                    Integer afState = result.get(CaptureResult.CONTROL_AF_STATE);
 
-                    if (aeState == null
-                            || aeState == CaptureResult.CONTROL_AE_STATE_PRECAPTURE
-                            || aeState == CaptureRequest.CONTROL_AE_STATE_FLASH_REQUIRED) {
+                   // if (aeState == null || aeState == CaptureResult.CONTROL_AE_STATE_PRECAPTURE || aeState == CaptureRequest.CONTROL_AE_STATE_FLASH_REQUIRED) {
+                    if (aeState == null || aeState == CaptureResult.CONTROL_AE_STATE_PRECAPTURE || aeState == CaptureRequest.CONTROL_AE_STATE_FLASH_REQUIRED || afState == null) {
                         state = STATE_WAITING_NON_PRECAPTURE;
                     }
+
                     break;
                 }
                 case STATE_WAITING_NON_PRECAPTURE: {
@@ -456,16 +458,23 @@ public class Camera2Base extends BaseCameraActivity implements View.OnClickListe
         jpegSize = ImageSize.chooseOptimalJpegSize(
                 Arrays.asList(map.getOutputSizes(ImageFormat.JPEG)),
                 BIOMETRY_IMAGE_WIDTH,
-                BIOMETRY_IMAGE_HEIGHT,
-                portrait);
+                BIOMETRY_IMAGE_HEIGHT);
+
 
         // proporção ideal para tela
         previewSize = ImageSize.getOptimalPreviewSize(
                 map.getOutputSizes(SurfaceTexture.class),
                 width,
                 height,
-                facing,
-                portrait);
+                facing);
+
+        if(previewSize.getWidth() == 1440 && previewSize.getHeight() == 720 || previewSize.getWidth() == 1280 && previewSize.getHeight() == 673 ) {
+            previewSize = new Size(1280, 720);
+         }
+
+      //  previewSize = new Size(1280, 720);
+
+
     }
 
 
@@ -620,10 +629,9 @@ public class Camera2Base extends BaseCameraActivity implements View.OnClickListe
             public void run() {
                 try {
 
+
                     closeCamera();
-
                     createImageReader();
-
                     cameraManager.openCamera(cameraId, stateCallback, backgroundHandler);
 
                 } catch (CameraAccessException e) {
@@ -826,6 +834,7 @@ public class Camera2Base extends BaseCameraActivity implements View.OnClickListe
                     previewRequestBuilder.build(),
                     captureCallback,
                     backgroundHandler);
+
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }

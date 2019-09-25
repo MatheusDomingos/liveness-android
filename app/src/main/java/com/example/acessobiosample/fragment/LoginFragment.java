@@ -121,8 +121,12 @@ public class LoginFragment extends CustomFragment {
         dialog.show();
 
 
+        Hawk.put(SharedKey.NAME, user);
+        Hawk.put(SharedKey.PASSWORD, password);
+
+
         ServiceGenerator
-                .createService(BioService.class, true, user, password)
+                .createService(BioService.class, true, Hawk.get(SharedKey.NAME), Hawk.get(SharedKey.PASSWORD))
                 .getAuthToken()
                 .enqueue(new Callback<GetAuthTokenResponse>() {
 
@@ -134,9 +138,10 @@ public class LoginFragment extends CustomFragment {
                         GetAuthTokenResponse body = response.body();
 
                         if (body != null && body.isValid()) {
+
+
                             Hawk.put(SharedKey.AUTH_TOKEN, body.getGetAuthTokenResult().getAuthToken());
-                            Hawk.put(SharedKey.NAME,etEmail.getText().toString());
-                            Hawk.put(SharedKey.PASSWORD,etPassword.getText().toString());
+
 
                             Intent intent = new Intent(getActivity(), SimpleViewActivity.class);
                             intent.putExtra(CustomFragment.FRAGMENT, HomeFragment.class);

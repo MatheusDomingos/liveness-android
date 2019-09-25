@@ -1,9 +1,11 @@
 package com.example.acessobiosample.fragment;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -16,6 +18,8 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.example.acessobiosample.R;
 import com.example.acessobiosample.activity.FormViewActivity;
@@ -48,6 +52,8 @@ public class NewProcessFragment extends CustomFragment {
     private Button btSexo, btCreate;
     private String gender;
 
+    protected static final int REQUEST_CAMERA_PERMISSION = 1;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
@@ -70,9 +76,14 @@ public class NewProcessFragment extends CustomFragment {
         btCreate = (Button) view.findViewById(R.id.btCreate);
 
 
+
         MaskEditTextChangedListener maskCPF = new MaskEditTextChangedListener("###.###.###-##", etCPF);
         etCPF.addTextChangedListener(maskCPF);
 
+//
+//        etNome.setText("Matheus Domingos");
+//        etCPF.setText("098.703.609-20");
+//        etSexo.setText("Masculino");
 
         btSexo.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -149,8 +160,6 @@ public class NewProcessFragment extends CustomFragment {
                                         }
 
 
-
-
                                     }
                                 }
 
@@ -186,6 +195,23 @@ public class NewProcessFragment extends CustomFragment {
 
         return view;
     }
+
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
+        {
+            ActivityCompat.requestPermissions(getActivity(), new String[] {
+                    Manifest.permission.CAMERA,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+            }, REQUEST_CAMERA_PERMISSION);
+            return;
+        }
+    }
+
 
 
     public void showDialogGenders() {

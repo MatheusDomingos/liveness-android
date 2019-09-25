@@ -631,7 +631,13 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
                         }
                         else {
 
+
+                            countDownCancelled[0] = Boolean.FALSE;
+                            isRequestImage = false;
+
                             dialog.dismiss();
+
+
 
                             String message = getErrorMessage(response);
                             if (message != null) {

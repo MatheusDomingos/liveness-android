@@ -2,6 +2,7 @@ package com.example.acessobiosample.adapter;
 
 import android.app.Activity;
 
+import android.graphics.PorterDuff;
 import android.view.View;
 
 
@@ -95,10 +96,18 @@ public class HomeAdapter<TPI> extends BaseAdapter<TPI, HomeAdapter.ViewHolder> {
 
         if(liveness == 0) {
             holder.tvLiveness.setText("Desligado");
+            holder.tvLiveness.setTextColor(ContextCompat.getColor(activity, R.color.darkGrey));
+            holder.icLiveness.setColorFilter(holder.icLiveness.getContext().getResources().getColor(R.color.darkGrey), PorterDuff.Mode.SRC_ATOP);
+
         }else if (liveness == 1){
             holder.tvLiveness.setText("Aprovado");
+            holder.tvLiveness.setTextColor(ContextCompat.getColor(activity, R.color.colorGreen));
+            holder.icLiveness.setColorFilter(holder.icLiveness.getContext().getResources().getColor(R.color.colorGreen), PorterDuff.Mode.SRC_ATOP);
         }else if (liveness == 2){
             holder.tvLiveness.setText("Reprovado");
+            holder.tvLiveness.setTextColor(ContextCompat.getColor(activity, R.color.red_btn_bg_pressed_color));
+            holder.icLiveness.setColorFilter(holder.icLiveness.getContext().getResources().getColor(R.color.red_btn_bg_pressed_color), PorterDuff.Mode.SRC_ATOP);
+
         }
 
         if(process.getScore() > 0) {
@@ -123,6 +132,7 @@ public class HomeAdapter<TPI> extends BaseAdapter<TPI, HomeAdapter.ViewHolder> {
         private TextView tvStatus;
         private TextView tvScore;
         private TextView tvLiveness;
+        private ImageView icLiveness;
 
         private CircularImageView ivUser;
 
@@ -136,6 +146,7 @@ public class HomeAdapter<TPI> extends BaseAdapter<TPI, HomeAdapter.ViewHolder> {
             tvStatus = ((TextView) itemView.findViewById(R.id.tvStatus));
             tvScore = ((TextView) itemView.findViewById(R.id.tvScore));
             tvLiveness = ((TextView) itemView.findViewById(R.id.tvLiveness));
+            icLiveness = ((ImageView) itemView.findViewById(R.id.ic_camera));
 
             ivUser = ((CircularImageView) itemView.findViewById(R.id.ivUser));
 

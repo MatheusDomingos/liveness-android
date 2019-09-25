@@ -59,6 +59,8 @@ public class SettingsFragment extends CustomFragment {
                                         public void onClick(View v) {
                                             Hawk.delete(SharedKey.CPF);
                                             Hawk.delete(SharedKey.NAME);
+                                            Hawk.delete(SharedKey.AUTH_TOKEN);
+
                                             Hawk.delete(SharedKey.AUTOCAPTURE);
                                             Hawk.delete(SharedKey.AUTOCAPTURE_VALUE);
                                             Hawk.delete(SharedKey.COUNT_REGRESSIVE);

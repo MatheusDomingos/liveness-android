@@ -35,7 +35,7 @@ public class SplashActivity extends AppCompatActivity {
 
                 Intent intent;
 
-                if(Hawk.contains(SharedKey.NAME)){
+                if(Hawk.contains(SharedKey.AUTH_TOKEN)){
 
                     intent = new Intent(SplashActivity.this, SimpleViewActivity.class);
                     intent.putExtra(CustomFragment.FRAGMENT, HomeFragment.class);

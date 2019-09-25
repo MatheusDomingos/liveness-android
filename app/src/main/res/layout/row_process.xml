@@ -86,6 +86,7 @@
                 android:gravity="center_vertical|right"
                 android:layout_marginTop="5dp">
                 <ImageView
+                    android:id="@+id/ic_camera"
                     android:layout_width="12dp"
                     android:layout_height="12dp"
                     android:layout_marginBottom="1dp"

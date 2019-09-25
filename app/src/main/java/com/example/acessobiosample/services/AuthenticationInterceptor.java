@@ -36,8 +36,8 @@ public class AuthenticationInterceptor implements Interceptor {
 
         if (auth) {
             builder.addHeader("X-AcessoBio-APIKEY", API_KEY);
-            builder.addHeader("X-Login", this.user);
-            builder.addHeader("X-Password", this.password);
+            builder.addHeader("X-Login", Hawk.get(SharedKey.NAME));
+            builder.addHeader("X-Password",Hawk.get(SharedKey.PASSWORD));
         } else {
             builder.addHeader("X-AcessoBio-APIKEY", API_KEY);
             builder.addHeader("Authentication", Hawk.get(SharedKey.AUTH_TOKEN, ""));
