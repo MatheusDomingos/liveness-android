@@ -1,6 +1,8 @@
 package com.example.acessobiosample.fragment;
 
 import android.Manifest;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.Signature;
@@ -54,6 +56,9 @@ public class LoginFragment extends CustomFragment {
     private EditText etEmail;
     private EditText etPassword;
     private Button btEnter;
+    private Button btInstance;
+    private EditText etInstance;
+
     private SweetAlertDialog dialog;
 
     @Nullable
@@ -78,6 +83,17 @@ public class LoginFragment extends CustomFragment {
         etEmail = (EditText) view.findViewById(R.id.etEmail);
         etPassword = (EditText) view.findViewById(R.id.etSenha);
         btEnter = (Button) view.findViewById(R.id.btEnter);
+
+        etInstance = (EditText) view.findViewById(R.id.etInstance);
+        btInstance = (Button) view.findViewById(R.id.btInstace);
+
+
+        btInstance.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDialogInstances();
+            }
+        });
 
         btEnter.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -111,7 +127,29 @@ public class LoginFragment extends CustomFragment {
     }
 
 
-    public void login(String user, String password) {
+    private void showDialogInstances() {
+
+        final String[] options = { "TREINAMENTO", "PRODUÇÃO"};
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Selecione a instância");
+        builder.setItems(options, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                etInstance.setText(options[which]);
+                if(which == 0) {
+                    Hawk.put(SharedKey.INSTANCE, "https://crediariohomolog.acesso.io/treinamento/services/v2/credService.svc/");
+                }else {
+                    Hawk.put(SharedKey.INSTANCE, "https://www2.acesso.io/seres/services/v2/credService.svc/");
+                }
+            }
+        });
+
+        builder.show();
+
+    }
+
+    private void login(String user, String password) {
 
 
         dialog = new SweetAlertDialog(getContext(), SweetAlertDialog.PROGRESS_TYPE);

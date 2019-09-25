@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.acessobiosample.R;
+import com.example.acessobiosample.activity.AuthenticationActivity;
 import com.example.acessobiosample.activity.FormViewActivity;
 import com.example.acessobiosample.activity.SimpleViewActivity;
 import com.example.acessobiosample.adapter.HomeAdapter;
@@ -70,6 +71,21 @@ public class HomeFragment extends CustomFragment {
 
 
         Hawk.init(getActivity()).build();
+
+        if(!Hawk.contains(SharedKey.INSTANCE)) {
+            Hawk.delete(SharedKey.CPF);
+            Hawk.delete(SharedKey.NAME);
+            Hawk.delete(SharedKey.AUTH_TOKEN);
+
+            Hawk.delete(SharedKey.AUTOCAPTURE);
+            Hawk.delete(SharedKey.AUTOCAPTURE_VALUE);
+            Hawk.delete(SharedKey.COUNT_REGRESSIVE);
+
+            Intent intent = new Intent(getActivity() , AuthenticationActivity.class);
+            intent.putExtra(CustomFragment.FRAGMENT, LoginFragment.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+        }
 
         rvProcess = ((RecyclerView) v.findViewById(R.id.list_simple_view));
         TextView tv_no_results = ((TextView) v.findViewById(R.id.tv_no_results));

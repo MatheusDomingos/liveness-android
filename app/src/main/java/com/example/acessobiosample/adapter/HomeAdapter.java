@@ -20,6 +20,7 @@ import com.example.acessobiosample.dto.Attachments;
 import com.example.acessobiosample.dto.GetProcessByUserResult;
 import com.example.acessobiosample.dto.Process;
 import com.example.acessobiosample.dto.Subject;
+import com.example.acessobiosample.utils.enumetators.SharedKey;
 import com.mikhaellopez.circularimageview.CircularImageView;
 import com.orhanobut.hawk.Hawk;
 
@@ -71,7 +72,17 @@ public class HomeAdapter<TPI> extends BaseAdapter<TPI, HomeAdapter.ViewHolder> {
             for(int i = 0; i < attachments.size(); i ++) {
                 Attachments attObj = attachments.get(i);
                 if(attObj.getName().equals("Foto do Cliente")) {
-                    Glide.with(activity).load("https://www2.acesso.io/seres/" + attObj.getUri()).fitCenter().into(holder.ivUser);
+
+
+                    if(Hawk.contains(SharedKey.INSTANCE)) {
+                     if(Hawk.get(SharedKey.INSTANCE).equals("https://crediariohomolog.acesso.io/treinamento/services/v2/credService.svc/"))  {
+                         Glide.with(activity).load("https://crediariohomolog.acesso.io/treinamento/" + attObj.getUri()).fitCenter().into(holder.ivUser);
+                     } else{
+                         Glide.with(activity).load("https://www2.acesso.io/seres/" + attObj.getUri()).fitCenter().into(holder.ivUser);
+                     }
+
+                    }
+
                 }
 
             }
