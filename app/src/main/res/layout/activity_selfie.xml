@@ -10,10 +10,14 @@
     android:padding="0dp"
     android:layout_margin="0dp">
 
-    <com.example.acessobiosample.utils.camera.AutoFitTextureView
+    <com.acesso.acessobiosample.utils.camera.AutoFitTextureView
         android:id="@+id/texture"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+
+        />
 
     <!-- Capture Stillshot Button -->
     <RelativeLayout
@@ -80,16 +84,14 @@
         android:id="@+id/lineBottom"
         android:layout_width="match_parent"
         android:layout_height="0px"
-        android:layout_alignParentBottom="true"
-        android:layout_marginTop="0dp"
+        android:layout_alignBottom="@+id/texture"
         android:background="@color/colorWhite" />
 
     <View
         android:id="@+id/lineTop"
         android:layout_width="match_parent"
         android:layout_height="0px"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="0dp"
+        android:layout_alignTop="@+id/texture"
         android:background="@color/colorWhite" />
 
     <View
