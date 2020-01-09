@@ -1,11 +1,17 @@
 package com.acesso.acessobiosample.activity;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.AssetFileDescriptor;
+import android.content.res.AssetManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
@@ -45,14 +51,21 @@ import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions;
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceLandmark;
 import com.orhanobut.hawk.Hawk;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
-
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+import org.tensorflow.lite.Interpreter;
 
 public class SelfieActivity extends Camera2Base implements ImageProcessor, CaptureImageProcessor {
 
@@ -153,6 +166,20 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
     private Boolean autoCapture;
     private Boolean countRegressive;
 
+    protected Interpreter tflite;
+
+
+    private static final int MAX_RESULTS = 3;
+    private static final int BATCH_SIZE = 1;
+    private static final int PIXEL_SIZE = 3;
+    private static final float THRESHOLD = 0.1f;
+
+    private static final int IMAGE_MEAN = 128;
+    private static final float IMAGE_STD = 128.0f;
+
+    private boolean quant = false;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -211,6 +238,18 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
         lineLeftView = findViewById(R.id.lineLeft);
         lineRightView = findViewById(R.id.lineRight);
 
+        try {
+            tflite = new Interpreter(loadModelFile(this));
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        String b64 = "";
+        byte[] imageAsBytes = Base64.decode(b64.getBytes(), Base64.DEFAULT);
+        Bitmap bitmap =  BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length);
+
+
     }
 
     @Override
@@ -220,6 +259,17 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
         activity.finish();
     }
 
+    /** Memory-map the model file in Assets. */
+    private MappedByteBuffer loadModelFile(Activity activity) throws IOException {
+
+        AssetFileDescriptor fileDescriptor = activity.getAssets().openFd("perto.tflite");
+        FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor());
+        FileChannel fileChannel = inputStream.getChannel();
+        long startOffset = fileDescriptor.getStartOffset();
+        long declaredLength = fileDescriptor.getDeclaredLength();
+        return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength);
+
+    }
 
     @Override
     public void process(byte[] image, int w, int h, int f) {
@@ -603,7 +653,92 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
         }
     }
 
+
+    private ByteBuffer convertBitmapToByteBuffer(Bitmap pBitmap) {
+
+        Bitmap bitmap = Bitmap.createScaledBitmap(pBitmap, 224, 224, false);
+
+        ByteBuffer byteBuffer;
+
+        int inputSize =  224;
+
+        if(quant) {
+            byteBuffer = ByteBuffer.allocateDirect(BATCH_SIZE * inputSize * inputSize * PIXEL_SIZE);
+        } else {
+            byteBuffer = ByteBuffer.allocateDirect(4 * BATCH_SIZE * inputSize * inputSize * PIXEL_SIZE);
+        }
+
+        byteBuffer.order(ByteOrder.nativeOrder());
+        int[] intValues = new int[inputSize * inputSize];
+        bitmap.getPixels(intValues, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
+        int pixel = 0;
+        for (int i = 0; i < inputSize; ++i) {
+            for (int j = 0; j < inputSize; ++j) {
+                final int val = intValues[pixel++];
+                if(quant){
+                    byteBuffer.put((byte) ((val >> 16) & 0xFF));
+                    byteBuffer.put((byte) ((val >> 8) & 0xFF));
+                    byteBuffer.put((byte) (val & 0xFF));
+                } else {
+                    byteBuffer.putFloat((((val >> 16) & 0xFF)-IMAGE_MEAN)/IMAGE_STD);
+                    byteBuffer.putFloat((((val >> 8) & 0xFF)-IMAGE_MEAN)/IMAGE_STD);
+                    byteBuffer.putFloat((((val) & 0xFF)-IMAGE_MEAN)/IMAGE_STD);
+                }
+
+            }
+        }
+        return byteBuffer;
+    }
+
+
+    public float[] convertByteToInt (byte[] byteArray) {
+
+        ByteBuffer buffer = ByteBuffer.wrap(byteArray);
+        float[] floatArray = new float[byteArray.length];
+
+        for(int i = 0; i < byteArray.length; i ++) {
+            floatArray[i] = buffer.getFloat(i);
+        }
+
+        return floatArray;
+    }
+
+
+
     private void faceInsert(String base64, String processId) {
+
+        try {
+
+            byte[] imageAsBytes = Base64.decode(base64.getBytes(), Base64.DEFAULT);
+
+            Bitmap bitmap = BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length);
+            ByteBuffer byteBuffer = convertBitmapToByteBuffer(bitmap);
+
+            if(quant){
+                byte[][] result = new byte[1][2];
+                tflite.run(byteBuffer, result);
+                System.out.println(result);;
+            } else {
+                float [][] result = new float[1][2];
+                tflite.run(byteBuffer, result);
+                System.out.println(result);
+
+            }
+
+
+//            String[] inputs = {"fotoboa", "fotodefoto"};
+//
+//            float[][] labelProbArray = new float[1][inputs.length];
+//
+//            float[] x = convertByteToInt(imageAsBytes);
+//            tflite.run(x, labelProbArray);
+
+        }catch (Exception e) {
+            System.out.println(e);
+        }
+
+
+
         FaceInsertRequest request = new FaceInsertRequest();
         request.setImagebase64(base64);
         request.setValidateLiveness(Hawk.get(SharedKey.LIVENESS, true));

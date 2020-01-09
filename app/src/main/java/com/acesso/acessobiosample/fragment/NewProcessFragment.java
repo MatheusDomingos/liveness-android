@@ -75,10 +75,10 @@ public class NewProcessFragment extends CustomFragment {
         MaskEditTextChangedListener maskCPF = new MaskEditTextChangedListener("###.###.###-##", etCPF);
         etCPF.addTextChangedListener(maskCPF);
 
-//
-//        etNome.setText("Matheus Domingos");
-//        etCPF.setText("098.703.609-20");
-//        etSexo.setText("Masculino");
+
+        etNome.setText("Matheus Domingos");
+        etCPF.setText("098.703.609-20");
+        etSexo.setText("Masculino");
 
         btSexo.setOnClickListener(new View.OnClickListener() {
             @Override
