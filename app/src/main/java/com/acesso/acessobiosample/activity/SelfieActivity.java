@@ -20,6 +20,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,6 +36,7 @@ import com.acesso.acessobiosample.fragment.CustomFragment;
 import com.acesso.acessobiosample.fragment.HomeFragment;
 import com.acesso.acessobiosample.services.BioService;
 import com.acesso.acessobiosample.services.ServiceGenerator;
+import com.acesso.acessobiosample.support.FocusView;
 import com.acesso.acessobiosample.utils.camera.CaptureImageProcessor;
 import com.acesso.acessobiosample.utils.camera.ImageProcessor;
 import com.acesso.acessobiosample.utils.dialog.SweetAlertDialog;
@@ -240,14 +242,14 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
 
         try {
             tflite = new Interpreter(loadModelFile(this));
-
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        String b64 = "";
-        byte[] imageAsBytes = Base64.decode(b64.getBytes(), Base64.DEFAULT);
-        Bitmap bitmap =  BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length);
+        FocusView focusView = new FocusView(this);
+
+        LinearLayout.LayoutParams lp =new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+        addContentView(focusView, lp);
 
 
     }

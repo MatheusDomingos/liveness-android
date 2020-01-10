@@ -15,7 +15,11 @@ apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
 
 repositories {
-    maven { url 'https://maven.fabric.io/public' }
+    maven {
+        url 'https://maven.fabric.io/public'
+        }
+
+    maven { url "https://jitpack.io" }
 }
 
 
@@ -84,6 +88,8 @@ dependencies {
 
     //TensorFlow
     implementation 'org.tensorflow:tensorflow-lite:+'
+
+    implementation 'com.github.iammert:MaterialIntroView:1.6.0'
 
     // ML Kit
     implementation 'com.google.firebase:firebase-ml-vision:19.0.3'
