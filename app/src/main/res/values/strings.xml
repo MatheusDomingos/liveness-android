@@ -10,7 +10,10 @@
     <string name="error_invalid_email">E-mail informado é inválido</string>
     <string name="error_invalid_celular">Celular informado é inválido</string>
 
-
+    <!-- Mask Status -->
+    <string name="status_success">Aguarde</string>
+    <string name="status_error">Enquadre seu rosto no contorno</string>
+    <string name="status_smile">Agora sorria</string>
 
     <!-- Custom Dialog -->
     <string name="dialog_default_title">Here\'s a message!</string>

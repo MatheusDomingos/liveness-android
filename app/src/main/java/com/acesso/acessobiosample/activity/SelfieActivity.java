@@ -1,31 +1,39 @@
 package com.acesso.acessobiosample.activity;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
-import android.content.res.AssetManager;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Handler;
 import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.core.content.res.ResourcesCompat;
 
 import com.acesso.acessobiosample.R;
 import com.acesso.acessobiosample.dto.ExecuteProcessResponse;
@@ -36,7 +44,8 @@ import com.acesso.acessobiosample.fragment.CustomFragment;
 import com.acesso.acessobiosample.fragment.HomeFragment;
 import com.acesso.acessobiosample.services.BioService;
 import com.acesso.acessobiosample.services.ServiceGenerator;
-import com.acesso.acessobiosample.support.FocusView;
+import com.acesso.acessobiosample.support.MaskSilhouette;
+import com.acesso.acessobiosample.support.MaskView;
 import com.acesso.acessobiosample.utils.camera.CaptureImageProcessor;
 import com.acesso.acessobiosample.utils.camera.ImageProcessor;
 import com.acesso.acessobiosample.utils.dialog.SweetAlertDialog;
@@ -55,13 +64,11 @@ import com.orhanobut.hawk.Hawk;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -76,10 +83,7 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
     private FirebaseVisionFaceDetector firebaseVisionFaceDetector;
     private FirebaseVisionImageMetadata metadata;
 
-    private TextView countdownView;
-
     private Toast toast;
-
 
     private final String[] mensagens = new String[] {
             "Centraliza o rosto",
@@ -95,13 +99,7 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
     private int erroIndex = -1;
     private boolean faceOK = true;
 
-    private View lineTopView;
-    private View lineBottomView;
-    private View lineLeftView;
-    private View lineRightView;
-
     private ImageView rectangleImageView;
-    private ImageButton takePictureImageButton;
 
     private float posVerticalLineLeft = 0.0f;
     private float posVerticalLineRight = 0.0f;
@@ -155,7 +153,6 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
 
     float aspectRatioBioEye = 1f;
 
-    private GradientDrawable rectangleDrawable;
     private SweetAlertDialog dialog;
 
     private String origin = "";
@@ -181,7 +178,23 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
 
     private boolean quant = false;
 
+    // Mask dinamiccally
+    MaskView maskView;
+    MaskSilhouette maskSilhouette;
+    @ColorInt Integer  currentColorBorder;
 
+    private TextView tvStatus;
+    private  View viewFlash;
+    private MaskView.MaskType maskType;
+
+    private enum Flow {
+        CLOSE , AFAR, SMILE
+    }
+
+    // Started with Flow.CLOSE flow
+    private  Flow flow = Flow.CLOSE;
+
+    @SuppressLint("ResourceAsColor")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -192,6 +205,8 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
         if (b != null) {
             origin = b.getString("origin");
         }
+
+        currentColorBorder = Color.WHITE;
 
         if (DEBUG) Log.d(TAG, "from activity: " + origin);
 
@@ -209,13 +224,10 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
 
         setContentView(R.layout.activity_selfie);
 
-        takePictureImageButton = findViewById(R.id.take_picture);
-        takePictureImageButton .setOnClickListener(this);
         textureView = findViewById(R.id.texture);
-        rootView = findViewById(R.id.root_view);
+
         autoCapture = Hawk.get(SharedKey.AUTOCAPTURE, true);
         countRegressive = Hawk.get(SharedKey.COUNT_REGRESSIVE, true);
-
 
         setMaxSizes();
 
@@ -229,16 +241,7 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
 
         firebaseVisionFaceDetector = FirebaseVision.getInstance().getVisionFaceDetector(options);
 
-        countdownView = findViewById(R.id.tvCountdown);
-        countdownView.setVisibility(View.INVISIBLE);
-
         rectangleImageView = findViewById(R.id.rectangle);
-        rectangleDrawable = ((GradientDrawable) rectangleImageView.getBackground());
-
-        lineTopView = findViewById(R.id.lineTop);
-        lineBottomView = findViewById(R.id.lineBottom);
-        lineLeftView = findViewById(R.id.lineLeft);
-        lineRightView = findViewById(R.id.lineRight);
 
         try {
             tflite = new Interpreter(loadModelFile(this));
@@ -246,12 +249,8 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
             e.printStackTrace();
         }
 
-        FocusView focusView = new FocusView(this);
-
-        LinearLayout.LayoutParams lp =new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
-        addContentView(focusView, lp);
-
-
+        // Mask
+        flowClose();
     }
 
     @Override
@@ -259,6 +258,104 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
         countDownCancelled[0] = Boolean.TRUE;
         destroyTimer();
         activity.finish();
+    }
+
+    private void addContentView(View view){
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+        addContentView(view, lp);
+    }
+
+
+    public static int dpToPx(int dp) {
+        return (int) (dp * Resources.getSystem().getDisplayMetrics().density);
+    }
+
+    public void insertTvStatus() {
+
+        if(tvStatus != null) {
+            ((ViewGroup) tvStatus.getParent()).removeView(tvStatus);
+        }
+
+        tvStatus = new TextView(this);
+
+        int widthTvStatus = (getWidthPixels() - dpToPx(150));
+
+        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
+                widthTvStatus, // Width of TextView
+                RelativeLayout.LayoutParams.WRAP_CONTENT); // Height of TextView
+
+        tvStatus.setLayoutParams(lp);
+        tvStatus.setPadding(0, dpToPx(10), 10, dpToPx(10));
+        tvStatus.setText(getString(R.string.status_error));
+        tvStatus.setTextColor(primaryColor);
+        tvStatus.setY(200);
+        tvStatus.setX((getWidthPixels() /2) - (widthTvStatus / 2));
+
+        GradientDrawable gd = new GradientDrawable();
+        gd.setShape(GradientDrawable.RECTANGLE);
+        gd.setColor(Color.WHITE); // make the background transparent
+        gd.setCornerRadius(15.0f); // border corner radius
+        tvStatus.setBackground(gd);
+        tvStatus.setBackground(gd);
+        tvStatus.setTextSize(TypedValue.COMPLEX_UNIT_SP,15);
+        tvStatus.setTypeface(null, Typeface.BOLD);
+        tvStatus.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+        tvStatus.setGravity(Gravity.CENTER);
+        addContentView(tvStatus, lp);
+
+    }
+
+    private void fireFlash(){
+        viewFlash = new View(this);
+        RelativeLayout.LayoutParams rp = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.MATCH_PARENT,
+                RelativeLayout.LayoutParams.MATCH_PARENT);
+        viewFlash.setLayoutParams(rp);
+        viewFlash.setBackgroundColor(Color.WHITE);
+        viewFlash.setAlpha((float) 0.7);
+        addContentView(viewFlash, rp);
+    }
+
+    private void insertMask(MaskView.MaskType maskType) {
+
+        this.maskType = maskType;
+
+        if(maskView != null) {
+            ((ViewGroup) maskView.getParent()).removeView(maskView);
+        }
+
+        if(maskType == MaskView.MaskType.CLOSE) {
+            maskView = new MaskView(this, MaskView.MaskType.CLOSE);
+        }else{
+            maskView = new MaskView(this, MaskView.MaskType.AFAR);
+        }
+
+        addContentView(maskView);
+
+    }
+
+    private void insertMask(MaskView.MaskType maskType, @ColorInt Integer  color) {
+
+        currentColorBorder = color;
+
+        if(maskView != null) {
+            ((ViewGroup) maskView.getParent()).removeView(maskView);
+        }
+
+        maskView = new MaskView(this, maskType);
+        maskSilhouette = new MaskSilhouette(this, maskView, maskType, color);
+
+        addContentView(maskView);
+    }
+
+    private void insertSillhoutte(@ColorInt Integer color) {
+
+        if(maskSilhouette != null) {
+            ((ViewGroup) maskSilhouette.getParent()).removeView(maskSilhouette);
+        }
+        maskSilhouette = new MaskSilhouette(this, maskView, this.maskType, color);
+        addContentView(maskSilhouette);
+
     }
 
     /** Memory-map the model file in Assets. */
@@ -273,6 +370,7 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
 
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void process(byte[] image, int w, int h, int f) {
 
@@ -403,31 +501,20 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
 
                                 if (faceOK) {
                                     markBlue();
-                                    takePictureImageButton.setEnabled(true);
                                 }
                                 else {
                                     markRed();
-                                    takePictureImageButton.setEnabled(false);
                                 }
-                                // exibe as grides em tela (caso ativo)
-                                if (showLines) {
-                                    addHorizontalLineBottom(posHorizontalLineBottom * aspectRatioRelative);
-                                    addHorizontalLineTop((posHorizontalLineTop * aspectRatioRelative));
-                                    addVerticalLineLeft(posVerticalLineLeft * aspectRatioRelative);
-                                    addVerticalLineRight(posVerticalLineRight * aspectRatioRelative);
-                                    showLines = false;
-                                }
+
                             }
                             else {
                                 erroIndex = 7;
                                 markRed();
-                                takePictureImageButton.setEnabled(false);
                             }
                         }
                         else {
                             erroIndex = 7;
                             markRed();
-                            takePictureImageButton.setEnabled(false);
                         }
 
                         runOnUiThread(new Runnable() {
@@ -451,10 +538,8 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
     private void destroyTimer () {
 
         if (countDownTimer != null) {
-            countdownView.setVisibility(View.INVISIBLE);
             countDownTimer.cancel();
             countDownTimer = null;
-            countdownView.setText("3");
         }
     }
 
@@ -462,30 +547,34 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
 
         if (countDownTimer == null && isRequestImage == false) {
 
-            countdownView.setVisibility(View.VISIBLE);
 
-            countDownTimer = new CountDownTimer(4000, 1000) {
+            countDownTimer = new CountDownTimer(2000, 1000) {
 
                 public void onTick(long millisUntilFinished) {
                     countDownCancelled[0] = Boolean.FALSE;
-                    countdownView.setText("" + String.format("%d",
-                            TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) -
-                                    TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished))));
-
-
                 }
 
+                @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
                 public void onFinish() {
                     if (!countDownCancelled[0]) {
                         //isRunning = false;
                         isRequestImage = true;
                         destroyTimer();
+
+                        fireFlash();
                         takePicture();
+
                     }
                 }
 
             };
             countDownTimer.start();
+        }
+    }
+
+    protected  void removeView(View view) {
+        if(view != null) {
+            ((ViewGroup) view.getParent()).removeView(view);
         }
     }
 
@@ -499,6 +588,7 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
 
                 }
 
+                @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
                 public void onFinish() {
                     //isRunning = false;
                     isRequestImage = true;
@@ -524,6 +614,15 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
             toast.cancel();
         }
 
+        @ColorInt Integer  colorGreen = ResourcesCompat.getColor(getResources(), R.color.colorGreenMaskBorder, null) ;
+
+        if(!currentColorBorder.equals(colorGreen)) {
+            currentColorBorder = colorGreen;
+            insertSillhoutte(colorGreen);
+            tvStatus.setText(getString(R.string.status_success));
+           // insertMask(MaskView.MaskType.CLOSE, ResourcesCompat.getColor(getResources(), R.color.colorGreenMaskBorder, null));
+        }
+
         if (autoCapture && countRegressive && !countDownCancelled[0]) {
             createTimer();
         }
@@ -535,20 +634,27 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
         if (screenWidth > 1600) {
             size = 34;
         }
-        rectangleDrawable.setStroke(size, primaryColor);
+
     }
+
 
     private void markRed() {
 
         destroyTimer();
+
+        if(currentColorBorder !=  Color.WHITE) {
+            currentColorBorder = Color.WHITE;
+            insertSillhoutte(Color.WHITE);
+            tvStatus.setText(getString(R.string.status_error));
+        }
 
         if (!countDownCancelled[0]) {
             int size = 18;
             if (screenWidth > 1600) {
                 size = 34;
             }
-            rectangleDrawable.setStroke(size, Color.RED);
         }
+
     }
 
     private void init(float widthBuffer, float heightBuffer) {
@@ -592,62 +698,78 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
             initialized = true;
         }
     }
-    private void addHorizontalLineBottom(float bottom) {
-        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams((int)(screenWidth), 10);
-        layoutParams.setMargins(0,(int)bottom,0,0);
-        lineBottomView.setLayoutParams(layoutParams);
-    }
-
-    private void addHorizontalLineTop(float top) {
-        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams((int)(screenWidth), 10);
-        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-        layoutParams.addRule(RelativeLayout.ALIGN_TOP, R.id.texture);
-        lineTopView.setLayoutParams(layoutParams);
-    }
-
-    private void addVerticalLineLeft(float left) {
-        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(10, (int)(screenHeight));
-        layoutParams.setMargins((int)left,0,0,0);
-        lineLeftView.setLayoutParams(layoutParams);
-    }
-
-    private void addVerticalLineRight(float right) {
-        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(10, (int)(screenHeight));
-        layoutParams.setMargins((int)right,0,0,0);
-        lineRightView.setLayoutParams(layoutParams);
-    }
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.take_picture: {
-                destroyTimer();
-                countDownCancelled[0] = Boolean.TRUE;
-                isRequestImage = true;
-                super.takePicture();
+
+    }
+
+    // this method changed the flow of proccess liveness.
+    private void changeTheFlow() {
+
+        ((ViewGroup) viewFlash.getParent()).removeView(viewFlash);
+        currentColorBorder = Color.WHITE;
+
+        switch (flow){
+            case CLOSE:
+                flow  = Flow.AFAR;
+                flowAfar();
                 break;
-            }
+            case AFAR:
+                flow = Flow.SMILE;
+                flowSmile();
+                break;
+            case SMILE:
+                break;
+            default:
         }
+
+    }
+
+    private void flowClose() {
+        insertMask(MaskView.MaskType.CLOSE);
+        insertTvStatus();
+    }
+
+    private void flowAfar(){
+        insertMask(MaskView.MaskType.AFAR);
+        insertSillhoutte(Color.WHITE);
+        insertTvStatus();
+        reopenCamera();
+    }
+
+    private void flowSmile() {
+        tvStatus.setText(getString(R.string.status_smile));
+        tvStatus.setTextColor( ResourcesCompat.getColor(getResources(), R.color.colorGreenMaskBorder, null));
     }
 
     @Override
     public void capture(String base64) {
 
-
         if (base64 != null) {
-            String processId = Hawk.get(SharedKey.PROCESS, "");
-            String cpf = Hawk.get(SharedKey.CPF, "");
 
-            dialog = new SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE);
-            dialog.getProgressHelper().setBarColor(Color.parseColor("#2980ff"));
-            dialog.setTitleText("Aguarde...");
-            dialog.setCancelable(false);
-            dialog.show();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+
+                    changeTheFlow();
+
+                }
+            });
+
+            //* String processId = Hawk.get(SharedKey.PROCESS, "");
+           //* String cpf = Hawk.get(SharedKey.CPF, "");
+
+//            dialog = new SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE);
+//            dialog.getProgressHelper().setBarColor(Color.parseColor("#2980ff"));
+//            dialog.setTitleText("Aguarde...");
+//            dialog.setCancelable(false);
+//            dialog.show();
 
             // cadastro
-            if (processId != null && processId.trim().length() > 0) {
-                faceInsert(base64, processId);
-            }
+           //* if (processId != null && processId.trim().length() > 0) {
+               //* faceInsert(base64, processId);
+            //*}
 
 
         } else {
@@ -969,10 +1091,10 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
 
             }
 
-            toast = Toast.makeText(this, message, Toast.LENGTH_SHORT);
-            toast.setGravity(Gravity.TOP|Gravity.CENTER, 0, 0);
-            toast.setText(message);
-            toast.show();
+//            toast = Toast.makeText(this, message, Toast.LENGTH_SHORT);
+//            toast.setGravity(Gravity.TOP|Gravity.CENTER, 0, 0);
+//            toast.setText(message);
+//            toast.show();
 
         } catch (Exception ex) {
             Log.d(TAG, ex.toString());

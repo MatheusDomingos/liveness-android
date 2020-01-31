@@ -40,13 +40,17 @@ public class SplashActivity extends AppCompatActivity {
 
                 if(Hawk.contains(SharedKey.AUTH_TOKEN)){
 
-                    intent = new Intent(SplashActivity.this, SimpleViewActivity.class);
-                    intent.putExtra(CustomFragment.FRAGMENT, HomeFragment.class);
-
+//                    intent = new Intent(SplashActivity.this, SimpleViewActivity.class);
+//                    intent.putExtra(CustomFragment.FRAGMENT, HomeFragment.class);
+                     intent = new Intent(SplashActivity.this, SelfieActivity.class);
+                    startActivity(intent);
                 }else{
 
-                    intent = new Intent(SplashActivity.this, AuthenticationActivity.class);
-                    intent.putExtra(CustomFragment.FRAGMENT, LoginFragment.class);
+//                    intent = new Intent(SplashActivity.this, AuthenticationActivity.class);
+//                    intent.putExtra(CustomFragment.FRAGMENT, LoginFragment.class);
+
+                     intent = new Intent(SplashActivity.this, SelfieActivity.class);
+                    startActivity(intent);
 
                 }
                 startActivity(intent);

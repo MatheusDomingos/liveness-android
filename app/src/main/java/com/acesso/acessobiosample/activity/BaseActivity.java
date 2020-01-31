@@ -1,6 +1,8 @@
 package com.acesso.acessobiosample.activity;
 
 import android.os.Bundle;
+import android.view.View;
+import android.view.ViewGroup;
 
 
 import androidx.annotation.Nullable;
@@ -40,6 +42,12 @@ public abstract class BaseActivity extends AppCompatActivity {
 
         }
 
+    }
+
+    protected  void removeView(View view) {
+        if(view != null) {
+            ((ViewGroup) view.getParent()).removeView(view);
+        }
     }
 
     /**

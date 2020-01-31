@@ -27,11 +27,13 @@ android {
     compileSdkVersion 28
     defaultConfig {
         applicationId "com.acesso.acessobiosample"
-        minSdkVersion 23
+        minSdkVersion 21
         targetSdkVersion 28
         versionCode 4
         versionName "1.0.4"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        vectorDrawables.useSupportLibrary = true
+
     }
     buildTypes {
         release {

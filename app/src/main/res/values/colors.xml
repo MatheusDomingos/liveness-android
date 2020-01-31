@@ -7,6 +7,9 @@
 
     <color name="colorGray">#909090</color>
 
+    <!-- FocusView -->
+    <color name="colorBlueMask">#394A62</color>
+    <color name="colorGreenMaskBorder">#71FF65</color>
 
     <color name="colorBlack">#000000</color>
 

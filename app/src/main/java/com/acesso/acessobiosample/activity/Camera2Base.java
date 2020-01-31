@@ -288,6 +288,7 @@ public class Camera2Base extends BaseCameraActivity implements View.OnClickListe
 
     protected CameraCaptureSession.CaptureCallback captureCallback = new CameraCaptureSession.CaptureCallback() {
 
+        @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
         protected void process(CaptureResult result) {
 
             switch (state) {
@@ -624,6 +625,7 @@ public class Camera2Base extends BaseCameraActivity implements View.OnClickListe
         if (DEBUG) Log.d(TAG, "Reopen camera");
 
         AsyncTask.THREAD_POOL_EXECUTOR.execute(new Runnable() {
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
             public void run() {
                 try {
@@ -692,6 +694,7 @@ public class Camera2Base extends BaseCameraActivity implements View.OnClickListe
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     protected void createCameraPreviewSession() {
         if (DEBUG) { Log.d(TAG, "Create preview session"); }
 
@@ -778,6 +781,7 @@ public class Camera2Base extends BaseCameraActivity implements View.OnClickListe
      * @param viewWidth  The width of `textureView`
      * @param viewHeight The height of `textureView`
      */
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     protected void configureTransform(int viewWidth, int viewHeight) {
 
         if (DEBUG) { Log.d(TAG, "Configure transform"); }
@@ -812,6 +816,7 @@ public class Camera2Base extends BaseCameraActivity implements View.OnClickListe
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     protected void takePicture() {
 
         if (DEBUG) { Log.d(TAG, "Take picture"); }
@@ -822,9 +827,11 @@ public class Camera2Base extends BaseCameraActivity implements View.OnClickListe
 
         try {
             // This is how to tell the camera to trigger.
-            previewRequestBuilder.set(
-                    CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER,
-                    CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER_START);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                previewRequestBuilder.set(
+                        CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER,
+                        CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER_START);
+            }
 
             // Tell #captureCallback to wait for the precapture sequence to be set.
             state = STATE_WAITING_PRECAPTURE;
@@ -839,6 +846,7 @@ public class Camera2Base extends BaseCameraActivity implements View.OnClickListe
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     protected void captureStillPicture() {
 
         if (DEBUG) { Log.d(TAG, "Capture still picture"); }
@@ -878,6 +886,7 @@ public class Camera2Base extends BaseCameraActivity implements View.OnClickListe
         return (ORIENTATIONS.get(rotation) + sensorOrientation + 270) % 360;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void onClick(View view) {
         takePicture();
@@ -954,6 +963,7 @@ public class Camera2Base extends BaseCameraActivity implements View.OnClickListe
         return displayMetrics.widthPixels;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     protected int getImageFirebaseVisionRotation() {
         try {
             return getRotationCompensation(cameraId, activity, getApplicationContext());
@@ -1007,6 +1017,7 @@ public class Camera2Base extends BaseCameraActivity implements View.OnClickListe
 
     static class CompareSizesByArea implements Comparator<Size> {
 
+        @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
         @Override
         public int compare(Size lhs, Size rhs) {
             // We cast here to ensure the multiplications won't overflow
