@@ -54,25 +54,21 @@ import androidx.annotation.RequiresApi;
 
   }
 
-
   public RectF maskClose(Canvas canvas) {
-
-    float x = (float) (getWidth() / 5.5);
-    float y = (float) (getHeight() / 5.5);
+    float x = (float) (getWidth() / 5);
     float width = canvas.getWidth() - x;
-    float height =  canvas.getHeight() - (y - 50);
-
-    return new RectF(x,  y  ,width,height); // x, y, width, height;
+    float height =  ((float )getHeight() / 2) + 60; // (2/4 + 60) Aumentei 60 compensando a label de status e aumentando um pouco o tamanho de 2/4 ta tela.
+    float y = (height / 2) ;
+    return new RectF(x, y  ,width, (height + y)); // x, y, width, height; (height + y) pois um lado achata o outro.
   }
 
   public RectF maskAfar(Canvas canvas) {
-
+    float screenHeight = canvas.getHeight();
     float x = (float) (getWidth() / 3.5);
-    float y = (float) (getHeight() / 3.5);
     float width = canvas.getWidth() - x;
-    float height =  canvas.getHeight() - (y - 50);
-
-    return new RectF(x,  y  , width, height); // x, y, width, height;
+    float height =  (((float )getHeight() / 3) ) + 60;
+    float y = (screenHeight / 2) - (height / 2) ;
+    return new RectF(x, y  ,width, (height + y)); // x, y, width, height; (height + y) pois um lado achata o outro.
   }
 
   @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)

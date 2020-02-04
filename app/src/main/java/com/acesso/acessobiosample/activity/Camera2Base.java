@@ -930,9 +930,8 @@ public class Camera2Base extends BaseCameraActivity implements View.OnClickListe
                 }
 
                 String base64 = ImageUtils.toBase64JPEG(bitmap, false);
+                captureImageProcessor.capture(base64, bitmap);
                 bitmap = null;
-
-                captureImageProcessor.capture(base64);
                 base64 = null;
 
             } catch (Exception ex) {

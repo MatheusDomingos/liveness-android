@@ -44,8 +44,10 @@ import com.acesso.acessobiosample.fragment.CustomFragment;
 import com.acesso.acessobiosample.fragment.HomeFragment;
 import com.acesso.acessobiosample.services.BioService;
 import com.acesso.acessobiosample.services.ServiceGenerator;
+import com.acesso.acessobiosample.support.BioLivenessValidate;
 import com.acesso.acessobiosample.support.MaskSilhouette;
 import com.acesso.acessobiosample.support.MaskView;
+import com.acesso.acessobiosample.support.TFBioReader;
 import com.acesso.acessobiosample.utils.camera.CaptureImageProcessor;
 import com.acesso.acessobiosample.utils.camera.ImageProcessor;
 import com.acesso.acessobiosample.utils.dialog.SweetAlertDialog;
@@ -68,7 +70,9 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -151,6 +155,11 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
     float screenWidth = 0f;
     float screenHeight = 0f;
 
+
+    float smilingProbability = 0f;
+    float leftEyeOpenProbability = 0f;
+    float rightEyeOpenProbability = 0f;
+
     float aspectRatioBioEye = 1f;
 
     private SweetAlertDialog dialog;
@@ -166,7 +175,6 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
     private Boolean countRegressive;
 
     protected Interpreter tflite;
-
 
     private static final int MAX_RESULTS = 3;
     private static final int BATCH_SIZE = 1;
@@ -187,8 +195,11 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
     private  View viewFlash;
     private MaskView.MaskType maskType;
 
+    private Bitmap bitmapClose;
+    private  Bitmap bitmapAfarSmiling;
+
     private enum Flow {
-        CLOSE , AFAR, SMILE
+        CLOSE , AFAR, SMILE, SMILE_ERROR
     }
 
     // Started with Flow.CLOSE flow
@@ -274,6 +285,7 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
 
         if(tvStatus != null) {
             ((ViewGroup) tvStatus.getParent()).removeView(tvStatus);
+            tvStatus = null;
         }
 
         tvStatus = new TextView(this);
@@ -322,6 +334,7 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
 
         if(maskView != null) {
             ((ViewGroup) maskView.getParent()).removeView(maskView);
+            maskView = null;
         }
 
         if(maskType == MaskView.MaskType.CLOSE) {
@@ -340,6 +353,7 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
 
         if(maskView != null) {
             ((ViewGroup) maskView.getParent()).removeView(maskView);
+            maskView = null;
         }
 
         maskView = new MaskView(this, maskType);
@@ -352,6 +366,7 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
 
         if(maskSilhouette != null) {
             ((ViewGroup) maskSilhouette.getParent()).removeView(maskSilhouette);
+            maskSilhouette = null;
         }
         maskSilhouette = new MaskSilhouette(this, maskView, this.maskType, color);
         addContentView(maskSilhouette);
@@ -415,6 +430,16 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
                             if (leftEyePosition != null && rightEyePosition != null) {
 
                                 headPosition = firebaseVisionFace.getHeadEulerAngleY();
+
+
+                                // --------  SMILE AND EYES VALIDATION  --------
+                                smilingProbability = firebaseVisionFace.getSmilingProbability();
+                                leftEyeOpenProbability = firebaseVisionFace.getLeftEyeOpenProbability();
+                                rightEyeOpenProbability = firebaseVisionFace.getRightEyeOpenProbability();
+                                Log.d(TAG, "L_EYE_P: " + leftEyeOpenProbability);
+                                Log.d(TAG, "R_EYE_P: " + rightEyeOpenProbability);
+                                Log.d(TAG, "SMLIG_P: " + smilingProbability);
+
 
                                 // Left Eye  -------------
                                 leftEyePosX = (h - rightEyePosition.getX());
@@ -536,7 +561,6 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
     }
 
     private void destroyTimer () {
-
         if (countDownTimer != null) {
             countDownTimer.cancel();
             countDownTimer = null;
@@ -547,8 +571,15 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
 
         if (countDownTimer == null && isRequestImage == false) {
 
+            // Estipulo o tempo de espera do timer. Se for o processo de sorriso, faço a captura de imediato.
+            long waitingTime;
+            if(flow == Flow.SMILE) {
+                waitingTime = 1000;
+            }else{
+                waitingTime = 2000;
+            }
 
-            countDownTimer = new CountDownTimer(2000, 1000) {
+            countDownTimer = new CountDownTimer(waitingTime, 1000) {
 
                 public void onTick(long millisUntilFinished) {
                     countDownCancelled[0] = Boolean.FALSE;
@@ -561,20 +592,18 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
                         isRequestImage = true;
                         destroyTimer();
 
-                        fireFlash();
-                        takePicture();
+                        if(flow == Flow.CLOSE || flow == Flow.SMILE) {
+                            fireFlash();
+                            takePicture();
+                        }else if (flow == Flow.AFAR) {
+                            changeTheFlow();
+                        }
 
                     }
                 }
 
             };
             countDownTimer.start();
-        }
-    }
-
-    protected  void removeView(View view) {
-        if(view != null) {
-            ((ViewGroup) view.getParent()).removeView(view);
         }
     }
 
@@ -619,12 +648,27 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
         if(!currentColorBorder.equals(colorGreen)) {
             currentColorBorder = colorGreen;
             insertSillhoutte(colorGreen);
-            tvStatus.setText(getString(R.string.status_success));
+
+            //
+            if(flow == Flow.SMILE) {
+                tvStatus.setTextColor(colorGreen);
+                tvStatus.setText(getString(R.string.status_smile));
+            }else{
+                tvStatus.setText(getString(R.string.status_success));
+            }
            // insertMask(MaskView.MaskType.CLOSE, ResourcesCompat.getColor(getResources(), R.color.colorGreenMaskBorder, null));
         }
 
         if (autoCapture && countRegressive && !countDownCancelled[0]) {
-            createTimer();
+
+            if(flow ==  Flow.SMILE) {
+                if(userIsSmilling()) {
+                    createTimer();
+                }
+
+            }else{
+                createTimer();
+            }
         }
         else if (autoCapture) {
             autoCapture();
@@ -637,6 +681,12 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
 
     }
 
+    /**
+     * @return Este metodo retorna true se a face em análise estiver sorrindo.
+     */
+    private boolean userIsSmilling () {
+        return smilingProbability > 0.9;
+    }
 
     private void markRed() {
 
@@ -646,6 +696,9 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
             currentColorBorder = Color.WHITE;
             insertSillhoutte(Color.WHITE);
             tvStatus.setText(getString(R.string.status_error));
+            if(flow == Flow.SMILE) {
+                tvStatus.setTextColor(primaryColor);
+            }
         }
 
         if (!countDownCancelled[0]) {
@@ -707,16 +760,21 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
     // this method changed the flow of proccess liveness.
     private void changeTheFlow() {
 
-        ((ViewGroup) viewFlash.getParent()).removeView(viewFlash);
-        currentColorBorder = Color.WHITE;
+        if(viewFlash != null) {
+            ((ViewGroup) viewFlash.getParent()).removeView(viewFlash);
+            viewFlash = null;
+        }
 
         switch (flow){
             case CLOSE:
                 flow  = Flow.AFAR;
+                currentColorBorder = Color.WHITE;
                 flowAfar();
                 break;
             case AFAR:
+                isRequestImage = false;
                 flow = Flow.SMILE;
+                currentColorBorder = Color.WHITE;
                 flowSmile();
                 break;
             case SMILE:
@@ -746,12 +804,33 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
     @Override
     public void capture(String base64) {
 
+    }
+
+    @Override
+    public void capture(String base64, Bitmap bitmap) {
+
         if (base64 != null) {
 
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
 
+                    if(flow == Flow.CLOSE) {
+                        bitmapClose = bitmap;
+                    }else if(flow == Flow.SMILE) {
+                        bitmapAfarSmiling = bitmap;
+
+                        TFBioReader tfBioReader = new  TFBioReader(SelfieActivity.this, "perto.tflite", "perto.tflite");
+                        Map<String, Float> mConfidenceClose = tfBioReader.processImage(bitmapClose);
+                        Map<String, Float> mConfidenceAfar = tfBioReader.processImage(bitmapAfarSmiling);
+
+                        BioLivenessValidate bioLivenessValidate = new BioLivenessValidate(mConfidenceClose, mConfidenceAfar, userIsSmilling(), true, true);
+                        HashMap<String, String> result = bioLivenessValidate.getLivenessResultDescription();
+                        System.out.println(result);
+
+                    }
+
+                    isRequestImage = false; // Added this line in the liveness branch. Before, this line was just after the faceInset request or in ErrorMethod.
                     changeTheFlow();
 
                 }
