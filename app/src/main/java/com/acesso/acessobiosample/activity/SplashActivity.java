@@ -6,6 +6,7 @@ import android.os.Handler;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.acesso.acessobiosample.fragment.WelcomeFragment;
 import com.crashlytics.android.Crashlytics;
 import com.acesso.acessobiosample.R;
 import com.acesso.acessobiosample.fragment.CustomFragment;
@@ -38,21 +39,19 @@ public class SplashActivity extends AppCompatActivity {
 
                 Intent intent;
 
-                if(Hawk.contains(SharedKey.AUTH_TOKEN)){
+//                if(Hawk.contains(SharedKey.AUTH_TOKEN)){
+//
+////                    intent = new Intent(SplashActivity.this, SimpleViewActivity.class);
+////                    intent.putExtra(CustomFragment.FRAGMENT, HomeFragment.class);
+//                     intent = new Intent(SplashActivity.this, SelfieActivity.class);
+//                    startActivity(intent);
+//                }else{
 
-//                    intent = new Intent(SplashActivity.this, SimpleViewActivity.class);
-//                    intent.putExtra(CustomFragment.FRAGMENT, HomeFragment.class);
-                     intent = new Intent(SplashActivity.this, SelfieActivity.class);
-                    startActivity(intent);
-                }else{
+                    intent = new Intent(SplashActivity.this, SimpleViewActivity.class);
+                    intent.putExtra(CustomFragment.FRAGMENT, WelcomeFragment.class);
+//                  intent = new Intent(SplashActivity.this, SelfieActivity.class);
 
-//                    intent = new Intent(SplashActivity.this, AuthenticationActivity.class);
-//                    intent.putExtra(CustomFragment.FRAGMENT, LoginFragment.class);
-
-                     intent = new Intent(SplashActivity.this, SelfieActivity.class);
-                    startActivity(intent);
-
-                }
+//                }
                 startActivity(intent);
 
             }

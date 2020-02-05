@@ -13,6 +13,9 @@
 
     <color name="colorBlack">#000000</color>
 
+    <color name="colorIntroTitle">#363D4F</color>
+    <color name="colorIntroDescription">#777E92</color>
+
 
     <color name="colorWhite">#ffffff</color>
     <color name="colorGreyDark">#363A3E</color>

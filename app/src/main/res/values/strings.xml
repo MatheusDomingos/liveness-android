@@ -15,6 +15,18 @@
     <string name="status_error">Enquadre seu rosto no contorno</string>
     <string name="status_smile">Agora sorria</string>
 
+    <!-- fragment Welcome -->
+    <string name="label_welcome">Seja bem vindo</string>
+    <string name="label_welcome_description">Esse é o aplicativo de testes de Biometria Facial Liveness da Acesso Digital</string>
+    <string name="label_button_start">Iniciar teste</string>
+
+    <!-- fragment Welcome -->
+    <string name="label_button_take">Tirar foto</string>
+    <string name="label_title_intro">Vamos precisar de sua foto</string>
+    <string name="label_descrption_intro">Centralize o rosto no contorno até ficar
+verde e siga as instruções na tela</string>
+
+
     <!-- Custom Dialog -->
     <string name="dialog_default_title">Here\'s a message!</string>
     <string name="dialog_ok">OK</string>

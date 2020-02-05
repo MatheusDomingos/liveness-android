@@ -857,6 +857,8 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
     }
 
 
+
+
     private ByteBuffer convertBitmapToByteBuffer(Bitmap pBitmap) {
 
         Bitmap bitmap = Bitmap.createScaledBitmap(pBitmap, 224, 224, false);
