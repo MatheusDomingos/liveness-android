@@ -9,6 +9,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
@@ -42,6 +43,8 @@ import com.acesso.acessobiosample.dto.FaceInsertResponse;
 import com.acesso.acessobiosample.dto.GetProcessResponse;
 import com.acesso.acessobiosample.fragment.CustomFragment;
 import com.acesso.acessobiosample.fragment.HomeFragment;
+import com.acesso.acessobiosample.fragment.IntroFragment;
+import com.acesso.acessobiosample.fragment.ResultFragment;
 import com.acesso.acessobiosample.services.BioService;
 import com.acesso.acessobiosample.services.ServiceGenerator;
 import com.acesso.acessobiosample.support.BioLivenessValidate;
@@ -52,6 +55,7 @@ import com.acesso.acessobiosample.utils.camera.CaptureImageProcessor;
 import com.acesso.acessobiosample.utils.camera.ImageProcessor;
 import com.acesso.acessobiosample.utils.dialog.SweetAlertDialog;
 import com.acesso.acessobiosample.utils.enumetators.SharedKey;
+import com.google.android.gms.common.util.ArrayUtils;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.ml.vision.FirebaseVision;
@@ -70,6 +74,10 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -140,13 +148,13 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
     float aspectRatioRelative = 0f;
 
     // diferença entre os olhos
-    final float minDiffEye = 100f;
-    final float maxDiffEye = 190f;
+    float minDiffEye = 160f;// old 100f
+    float maxDiffEye = 240f; // old: 190f
     float densityFactor = 2f;
     float densityMultiply = 2f;
 
     // área em % da tela permitida para enquadramento na horizontal
-    float percentHorizontalRange = 25f;
+    float percentHorizontalRange = 20f; // antigo:  percentHorizontalRange = 25f
     // área em % da tela permitida para enquadramento na vertical
     float percentVerticalRange = 30f;
     float percentOffsetVerticalRange = 30f;
@@ -186,24 +194,37 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
 
     private boolean quant = false;
 
+
+
     // Mask dinamiccally
     MaskView maskView;
     MaskSilhouette maskSilhouette;
     @ColorInt Integer  currentColorBorder;
-
     private TextView tvStatus;
+    RelativeLayout.LayoutParams lpStatus;
     private  View viewFlash;
     private MaskView.MaskType maskType;
+    public RectF rectMask;
 
+    // Bitmaps
     private Bitmap bitmapClose;
     private  Bitmap bitmapAfarSmiling;
 
+    private String base64Close;
+    private String base64Afar;
+
+    // Flows
     private enum Flow {
         CLOSE , AFAR, SMILE, SMILE_ERROR
     }
-
     // Started with Flow.CLOSE flow
     private  Flow flow = Flow.CLOSE;
+    private boolean isChangeFlow = true;
+
+    List<Float> arrLeftEyeOpenProbability = new ArrayList<Float>();
+
+   // This variable indicates the hour/minute/second of the begin process.
+    Date startDateOfProcess;
 
     @SuppressLint("ResourceAsColor")
     @Override
@@ -290,14 +311,14 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
 
         tvStatus = new TextView(this);
 
-        int widthTvStatus = (getWidthPixels() - dpToPx(150));
+        int widthTvStatus = (getWidthPixels() - dpToPx(120));
 
         RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
                 widthTvStatus, // Width of TextView
                 RelativeLayout.LayoutParams.WRAP_CONTENT); // Height of TextView
-
+        lp.addRule(RelativeLayout.CENTER_VERTICAL);
         tvStatus.setLayoutParams(lp);
-        tvStatus.setPadding(0, dpToPx(10), 10, dpToPx(10));
+        tvStatus.setPadding(0, dpToPx(10), 0, dpToPx(10));
         tvStatus.setText(getString(R.string.status_error));
         tvStatus.setTextColor(primaryColor);
         tvStatus.setY(200);
@@ -312,7 +333,6 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
         tvStatus.setTextSize(TypedValue.COMPLEX_UNIT_SP,15);
         tvStatus.setTypeface(null, Typeface.BOLD);
         tvStatus.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-        tvStatus.setGravity(Gravity.CENTER);
         addContentView(tvStatus, lp);
 
     }
@@ -338,9 +358,9 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
         }
 
         if(maskType == MaskView.MaskType.CLOSE) {
-            maskView = new MaskView(this, MaskView.MaskType.CLOSE);
+            maskView = new MaskView(this, MaskView.MaskType.CLOSE, this);
         }else{
-            maskView = new MaskView(this, MaskView.MaskType.AFAR);
+            maskView = new MaskView(this, MaskView.MaskType.AFAR, this);
         }
 
         addContentView(maskView);
@@ -356,7 +376,7 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
             maskView = null;
         }
 
-        maskView = new MaskView(this, maskType);
+        maskView = new MaskView(this, maskType, this);
         maskSilhouette = new MaskSilhouette(this, maskView, maskType, color);
 
         addContentView(maskView);
@@ -431,15 +451,18 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
 
                                 headPosition = firebaseVisionFace.getHeadEulerAngleY();
 
-
                                 // --------  SMILE AND EYES VALIDATION  --------
                                 smilingProbability = firebaseVisionFace.getSmilingProbability();
                                 leftEyeOpenProbability = firebaseVisionFace.getLeftEyeOpenProbability();
                                 rightEyeOpenProbability = firebaseVisionFace.getRightEyeOpenProbability();
-                                Log.d(TAG, "L_EYE_P: " + leftEyeOpenProbability);
-                                Log.d(TAG, "R_EYE_P: " + rightEyeOpenProbability);
-                                Log.d(TAG, "SMLIG_P: " + smilingProbability);
 
+                                if(DEBUG) {
+                                    Log.d(TAG, "L_EYE_P: " + leftEyeOpenProbability);
+                                    Log.d(TAG, "R_EYE_P: " + rightEyeOpenProbability);
+                                    Log.d(TAG, "SMLIG_P: " + smilingProbability);
+                                }
+
+                                arrLeftEyeOpenProbability.add(leftEyeOpenProbability);
 
                                 // Left Eye  -------------
                                 leftEyePosX = (h - rightEyePosition.getX());
@@ -468,13 +491,13 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
                                 noseRange = (diffEye / 3);
                                 float maxDiffNose = (noseRange * (float)2.2);
 
-                                if (DEBUG) {
+                              //  if (DEBUG) {
                                     Log.d(TAG, "Entre olhos: " + diffEye);
                                     Log.d(TAG, "Olho esquerdo (X): " + leftEyePosX);
                                     Log.d(TAG, "Olho esquerdo (Y): " + leftEyePosY);
                                     Log.d(TAG, "Olho direito (X): " + rightEyePosX);
                                     Log.d(TAG, "Olho direito (Y): " + rightEyePosY);
-                                }
+                              //  }
 
                                 // Olhos fora do enquadramento na horizontal
                                 if (leftEyePosX < posVerticalLineLeft || rightEyePosX > posVerticalLineRight) {
@@ -495,6 +518,7 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
                                 }
                                 // Rosto muito próximo
                                 else if (diffEye < minDiffEye) {
+                                    System.out.println("ROSTO PROXIMO");
                                     erroIndex = 3;
                                     faceOK = false;
                                 }
@@ -656,12 +680,14 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
             }else{
                 tvStatus.setText(getString(R.string.status_success));
             }
-           // insertMask(MaskView.MaskType.CLOSE, ResourcesCompat.getColor(getResources(), R.color.colorGreenMaskBorder, null));
+
+            // insertMask(MaskView.MaskType.CLOSE, ResourcesCompat.getColor(getResources(), R.color.colorGreenMaskBorder, null));
         }
 
         if (autoCapture && countRegressive && !countDownCancelled[0]) {
 
             if(flow ==  Flow.SMILE) {
+
                 if(userIsSmilling()) {
                     createTimer();
                 }
@@ -687,6 +713,30 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
     private boolean userIsSmilling () {
         return smilingProbability > 0.9;
     }
+
+    /**
+     * @return Este metodo retorna true se a face em análise estiver piscando.
+     */
+    private boolean userIsBlinking () {
+
+        float[] floatBlink = new float[arrLeftEyeOpenProbability.size()];
+        int i = 0;
+
+        for (Float f : arrLeftEyeOpenProbability) {
+            floatBlink[i++] = (f != null ? f : Float.NaN); // Or whatever default you want.
+        }
+        Arrays.sort(floatBlink, 0, floatBlink.length);
+
+        if(floatBlink[floatBlink.length - 1] > 0.8f &&
+            floatBlink[0] < 0.5f && floatBlink[1] < 0.5f && floatBlink[2] < 0.5f){
+            return true;
+        }else{
+            return false;
+        }
+
+    }
+
+
 
     private void markRed() {
 
@@ -737,15 +787,16 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
             float refWidth = isBufferPortrait ? widthBuffer : heightBuffer;
             float refHeight = isBufferPortrait ? heightBuffer : widthBuffer;
 
-            float topOffet = (refHeight * (percentOffsetVerticalRange) / 100);
-            float heightRange = (refHeight * (percentVerticalRange) / 100);
+            float topOffet = (refHeight * ((percentOffsetVerticalRange) / 100));
+            float heightRange = (refHeight * ((percentVerticalRange) / 100));
 
             // densidade
             DisplayMetrics metrics = getResources().getDisplayMetrics();
             densityFactor = metrics.density;
 
             posVerticalLineLeft = (refWidth * (percentHorizontalRange / 100));
-            posVerticalLineRight = (refWidth * ((percentHorizontalRange / 100) * 3));
+           // posVerticalLineRight = (refWidth * ((percentHorizontalRange / 100) * 3)); - old version
+            posVerticalLineRight = (refWidth * ((percentHorizontalRange / 100) * 4));
             posHorizontalLineTop = topOffet;
             posHorizontalLineBottom = topOffet + heightRange;
             initialized = true;
@@ -760,12 +811,15 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
     // this method changed the flow of proccess liveness.
     private void changeTheFlow() {
 
+        isChangeFlow = true;
+
         if(viewFlash != null) {
             ((ViewGroup) viewFlash.getParent()).removeView(viewFlash);
             viewFlash = null;
         }
 
         switch (flow){
+
             case CLOSE:
                 flow  = Flow.AFAR;
                 currentColorBorder = Color.WHITE;
@@ -796,7 +850,47 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
         reopenCamera();
     }
 
+    public void initParamsBio (RectF rectF) {
+        if(isChangeFlow){
+            isChangeFlow = false;
+            this.rectMask = rectF;
+            if(flow == Flow.CLOSE) {
+                paramsBioClose();
+            }else{
+                paramsBioAfar();
+            }
+        }
+
+    }
+
+    private void paramsBioClose(){
+
+        // This condition verify wether the flow is close and different of smile error. Then the startTime is initialized.
+        if(flow == Flow.CLOSE && flow != Flow.SMILE_ERROR) {
+            startDateOfProcess = Calendar.getInstance().getTime();
+        }
+
+        minDiffEye = 160f;
+        maxDiffEye = 240f;
+        posVerticalLineLeft = this.rectMask.left;
+        posVerticalLineRight = this.rectMask.right;
+        posHorizontalLineTop = this.rectMask.top + 200f;
+        posHorizontalLineBottom = this.rectMask.bottom - 200f;
+    }
+
+    private void paramsBioAfar(){
+        markRed();
+        minDiffEye = 80f;
+        maxDiffEye = 160f;
+        posVerticalLineLeft = this.rectMask.left;
+        posVerticalLineRight = this.rectMask.right;
+        posHorizontalLineTop = this.rectMask.top + 200f;
+        posHorizontalLineBottom = this.rectMask.bottom - 200f;
+    }
+
+
     private void flowSmile() {
+        userIsBlinking();
         tvStatus.setText(getString(R.string.status_smile));
         tvStatus.setTextColor( ResourcesCompat.getColor(getResources(), R.color.colorGreenMaskBorder, null));
     }
@@ -817,16 +911,30 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
 
                     if(flow == Flow.CLOSE) {
                         bitmapClose = bitmap;
+                        base64Close = base64;
                     }else if(flow == Flow.SMILE) {
                         bitmapAfarSmiling = bitmap;
+                        base64Afar = base64;
 
-                        TFBioReader tfBioReader = new  TFBioReader(SelfieActivity.this, "perto.tflite", "perto.tflite");
+                        TFBioReader tfBioReader = new  TFBioReader(SelfieActivity.this, "perto.tflite", "longe.tflite");
                         Map<String, Float> mConfidenceClose = tfBioReader.processImage(bitmapClose);
                         Map<String, Float> mConfidenceAfar = tfBioReader.processImage(bitmapAfarSmiling);
 
-                        BioLivenessValidate bioLivenessValidate = new BioLivenessValidate(mConfidenceClose, mConfidenceAfar, userIsSmilling(), true, true);
+                        BioLivenessValidate bioLivenessValidate = new BioLivenessValidate(mConfidenceClose, mConfidenceAfar, userIsSmilling(), userIsBlinking(), startDateOfProcess);
                         HashMap<String, String> result = bioLivenessValidate.getLivenessResultDescription();
                         System.out.println(result);
+
+                       // result.put("bitmapClose", base64Close);
+                        //result.put("bitmapAfar", base64Afar);
+                        Bitmap bitClose = Bitmap.createScaledBitmap(bitmapClose, 200, 280, false);
+                        Bitmap bitAfar = Bitmap.createScaledBitmap(bitmapAfarSmiling, 200, 280, false);
+
+                        Intent intent = new Intent(SelfieActivity.this, SimpleViewActivity.class);
+                        intent.putExtra(CustomFragment.FRAGMENT, ResultFragment.class);
+                        intent.putExtra("livenessResult", result);
+                        intent.putExtra("bitmapClose", bitClose);
+                        intent.putExtra("bitmapAfar", bitAfar);
+                        startActivity(intent);
 
                     }
 
@@ -855,6 +963,10 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
             showErrorMessage("Erro ao recuperar imagem capturada");
         }
     }
+
+
+
+
 
 
 

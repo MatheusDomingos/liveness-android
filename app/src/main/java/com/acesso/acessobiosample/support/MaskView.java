@@ -11,12 +11,15 @@ import android.util.AttributeSet;
 import android.view.View;
 import androidx.annotation.RequiresApi;
 
-  public class MaskView extends View {
+import com.acesso.acessobiosample.activity.SelfieActivity;
+
+public class MaskView extends View {
   private Paint mTransparentPaint;
   private Paint mSemiBlackPaint;
   private Path mPath = new Path();
 
   Canvas canvasGlobal = new Canvas();
+  SelfieActivity selfieActivity;
 
   public enum MaskType {
       CLOSE , AFAR
@@ -29,9 +32,10 @@ import androidx.annotation.RequiresApi;
     initPaints();
   }
 
-  public MaskView(Context context, MaskType mType) {
+  public MaskView(Context context, MaskType mType, SelfieActivity selfieActivity) {
     super(context);
     this.mType = mType;
+    this.selfieActivity = selfieActivity;
     initPaints();
   }
 
@@ -59,7 +63,9 @@ import androidx.annotation.RequiresApi;
     float width = canvas.getWidth() - x;
     float height =  ((float )getHeight() / 2) + 60; // (2/4 + 60) Aumentei 60 compensando a label de status e aumentando um pouco o tamanho de 2/4 ta tela.
     float y = (height / 2) ;
-    return new RectF(x, y  ,width, (height + y)); // x, y, width, height; (height + y) pois um lado achata o outro.
+    RectF rectF = new RectF(x, y  ,width, (height + y));
+    this.selfieActivity.initParamsBio(rectF);
+    return  rectF;// x, y, width, height; (height + y) pois um lado achata o outro.
   }
 
   public RectF maskAfar(Canvas canvas) {
@@ -68,7 +74,9 @@ import androidx.annotation.RequiresApi;
     float width = canvas.getWidth() - x;
     float height =  (((float )getHeight() / 3) ) + 60;
     float y = (screenHeight / 2) - (height / 2) ;
-    return new RectF(x, y  ,width, (height + y)); // x, y, width, height; (height + y) pois um lado achata o outro.
+      RectF rectF = new RectF(x, y  ,width, (height + y));
+      this.selfieActivity.initParamsBio(rectF);
+    return rectF; // x, y, width, height; (height + y) pois um lado achata o outro.
   }
 
   @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)

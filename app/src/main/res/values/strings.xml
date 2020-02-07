@@ -26,6 +26,13 @@
     <string name="label_descrption_intro">Centralize o rosto no contorno até ficar
 verde e siga as instruções na tela</string>
 
+    <!-- fragment Success Liveness -->
+    <string name="label_liveness_success">Biometria capturada\ncom sucesso!</string>
+    <string name="label_liveness_error">Biometria capturada\ncom sucesso!</string>
+    <string name="label_give_feedback">Dar feedback</string>
+    <string name="label_exit">Sair</string>
+
+
 
     <!-- Custom Dialog -->
     <string name="dialog_default_title">Here\'s a message!</string>
