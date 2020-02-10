@@ -15,7 +15,15 @@ import com.acesso.acessobiosample.R;
 import com.acesso.acessobiosample.activity.FormViewActivity;
 
 import com.acesso.acessobiosample.activity.SimpleViewActivity;
+import com.acesso.acessobiosample.dto.GetAuthTokenResponse;
+import com.acesso.acessobiosample.services.BioService;
+import com.acesso.acessobiosample.services.ServiceGenerator;
+import com.acesso.acessobiosample.utils.enumetators.SharedKey;
 import com.orhanobut.hawk.Hawk;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class WelcomeFragment extends CustomFragment{
 
@@ -40,5 +48,7 @@ public class WelcomeFragment extends CustomFragment{
 
         return v;
     }
+
+
 
 }

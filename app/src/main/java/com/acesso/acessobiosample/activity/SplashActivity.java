@@ -3,10 +3,14 @@ package com.acesso.acessobiosample.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.acesso.acessobiosample.dto.GetAuthTokenResponse;
 import com.acesso.acessobiosample.fragment.WelcomeFragment;
+import com.acesso.acessobiosample.services.BioService;
+import com.acesso.acessobiosample.services.ServiceGenerator;
 import com.crashlytics.android.Crashlytics;
 import com.acesso.acessobiosample.R;
 import com.acesso.acessobiosample.fragment.CustomFragment;
@@ -15,6 +19,9 @@ import com.acesso.acessobiosample.fragment.LoginFragment;
 import com.acesso.acessobiosample.utils.enumetators.SharedKey;
 import com.orhanobut.hawk.Hawk;
 import io.fabric.sdk.android.Fabric;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -37,7 +44,6 @@ public class SplashActivity extends AppCompatActivity {
             @Override
             public void run() {
 
-                Intent intent;
 
 //                if(Hawk.contains(SharedKey.AUTH_TOKEN)){
 //
@@ -47,13 +53,11 @@ public class SplashActivity extends AppCompatActivity {
 //                    startActivity(intent);
 //                }else{
 
-                    intent = new Intent(SplashActivity.this, SimpleViewActivity.class);
-                    intent.putExtra(CustomFragment.FRAGMENT, WelcomeFragment.class);
+                    getAuthToken();
 //                  intent = new Intent(SplashActivity.this, SelfieActivity.class);
 
 //                }
-                startActivity(intent);
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+
 
 
             }
@@ -61,6 +65,46 @@ public class SplashActivity extends AppCompatActivity {
 
 
 
+
+    }
+
+    private void getAuthToken(){
+
+        Hawk.put(SharedKey.NAME, "ADMIN");
+        Hawk.put(SharedKey.PASSWORD, "Ac3ss0#66");
+
+
+        ServiceGenerator
+                .createService(BioService.class, true, null)
+                .getAuthToken()
+                .enqueue(new Callback<GetAuthTokenResponse>() {
+
+                    @Override
+                    public void onResponse(Call<GetAuthTokenResponse> call, Response<GetAuthTokenResponse> response) {
+
+                        GetAuthTokenResponse body = response.body();
+
+                        if (body != null && body.isValid()) {
+
+
+                            Hawk.put(SharedKey.AUTH_TOKEN, body.getGetAuthTokenResult().getAuthToken());
+
+                            Intent intent;
+                            intent = new Intent(SplashActivity.this, SimpleViewActivity.class);
+                            intent.putExtra(CustomFragment.FRAGMENT, WelcomeFragment.class);
+                            startActivity(intent);
+                            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                        }
+                        else {
+                            Log.d("SplashActivity",body != null ? body.getMessageError() : "Erro ao recuperar token");
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<GetAuthTokenResponse> call, Throwable t) {
+                        Log.d("SplashActivity",t.getMessage());
+                    }
+                });
 
     }
 

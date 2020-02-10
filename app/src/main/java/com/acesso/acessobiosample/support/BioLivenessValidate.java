@@ -22,6 +22,7 @@ public class BioLivenessValidate {
     private float score;
     private float SCORE_MINIMUM = (float) 74.0;
 
+    long elapsedSeconds;
 
     public BioLivenessValidate(Map<String, Float> mConfidenceClose, Map<String, Float> mConfidenceAfar, boolean pUserIsSmilling, boolean pUserIsBlinking, Date pDateStartProcess) {
         this.dictClose = mConfidenceClose;
@@ -114,10 +115,16 @@ public class BioLivenessValidate {
 
         HashMap<String, String> result = new HashMap<>();
         if(score >= SCORE_MINIMUM) {
-            result.put("isLive" , "1");
+            result.put("isLiveness" , "1");
         }else{
-            result.put("isLive" , "0");
+            result.put("isLiveness" , "0");
         }
+
+        result.put("ScoreClose" , String.valueOf(confidencePhotoCloseLive));
+        result.put("ScoreAway" , String.valueOf(confidencePhotoAwayLive));
+        result.put("isLiveClose" , String.valueOf(photoCloseLive));
+        result.put("isLiveAway" , String.valueOf(photoAwayLive));
+        result.put("Time" , String.valueOf(elapsedSeconds));
         result.put("Score" , String.valueOf(score));
         result.put("Description" , description);
 
@@ -134,7 +141,7 @@ public class BioLivenessValidate {
         long hoursInMilli = minutesInMilli * 60;
         long daysInMilli = hoursInMilli * 24;
 
-        long elapsedSeconds = different / secondsInMilli;
+        elapsedSeconds = different / secondsInMilli;
 
         this.isFastProcess = elapsedSeconds < 10;
 

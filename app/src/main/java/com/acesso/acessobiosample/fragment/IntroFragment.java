@@ -1,13 +1,19 @@
 package com.acesso.acessobiosample.fragment;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.Image;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 
 import androidx.annotation.Nullable;
 
@@ -17,6 +23,8 @@ import com.acesso.acessobiosample.activity.SelfieActivity;
 import com.orhanobut.hawk.Hawk;
 
 import java.util.Objects;
+
+import static androidx.core.content.ContextCompat.getSystemService;
 
 public class IntroFragment extends CustomFragment{
 
@@ -41,6 +49,8 @@ public class IntroFragment extends CustomFragment{
             @Override
             public void onClick(View v) {
 
+               // exibirMensagemEdt("Se identifique para o teste", "Insira seu nome");
+
                 Intent intent = new Intent(getActivity(), SelfieActivity.class);
                 startActivity(intent);
 
@@ -48,6 +58,33 @@ public class IntroFragment extends CustomFragment{
         });
 
         return v;
+    }
+
+    private void exibirMensagemEdt(String titulo, String texto){
+
+        LinearLayout layout = new LinearLayout(getActivity());
+        layout.setOrientation(LinearLayout.VERTICAL);
+        final EditText titleBox = new EditText(getActivity());
+        titleBox.setHint("Nome");
+        layout.addView(titleBox); // Notice this is an add method
+        final EditText descriptionBox = new EditText(getActivity());
+        descriptionBox.setHint("CPF");
+        layout.addView(descriptionBox); // Another add method
+
+        AlertDialog.Builder mensagem = new AlertDialog.Builder(getActivity());
+        mensagem.setTitle(titulo);
+        mensagem.setMessage(null);
+        mensagem.setView(layout);
+        mensagem.setNeutralButton("OK", new DialogInterface.OnClickListener() {
+
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+
+        });
+
+        mensagem.show();
+
     }
 
 }

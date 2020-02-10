@@ -15,12 +15,10 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.os.Handler;
 import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -41,21 +39,21 @@ import com.acesso.acessobiosample.dto.ExecuteProcessResponse;
 import com.acesso.acessobiosample.dto.FaceInsertRequest;
 import com.acesso.acessobiosample.dto.FaceInsertResponse;
 import com.acesso.acessobiosample.dto.GetProcessResponse;
+import com.acesso.acessobiosample.dto.LivenessRequest;
 import com.acesso.acessobiosample.fragment.CustomFragment;
 import com.acesso.acessobiosample.fragment.HomeFragment;
-import com.acesso.acessobiosample.fragment.IntroFragment;
 import com.acesso.acessobiosample.fragment.ResultFragment;
 import com.acesso.acessobiosample.services.BioService;
 import com.acesso.acessobiosample.services.ServiceGenerator;
+import com.acesso.acessobiosample.support.BioLivenessService;
 import com.acesso.acessobiosample.support.BioLivenessValidate;
-import com.acesso.acessobiosample.support.MaskSilhouette;
-import com.acesso.acessobiosample.support.MaskView;
+import com.acesso.acessobiosample.support.BioMaskSilhouette;
+import com.acesso.acessobiosample.support.BioMaskView;
 import com.acesso.acessobiosample.support.TFBioReader;
 import com.acesso.acessobiosample.utils.camera.CaptureImageProcessor;
 import com.acesso.acessobiosample.utils.camera.ImageProcessor;
 import com.acesso.acessobiosample.utils.dialog.SweetAlertDialog;
 import com.acesso.acessobiosample.utils.enumetators.SharedKey;
-import com.google.android.gms.common.util.ArrayUtils;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.ml.vision.FirebaseVision;
@@ -197,13 +195,13 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
 
 
     // Mask dinamiccally
-    MaskView maskView;
-    MaskSilhouette maskSilhouette;
+    BioMaskView bioMaskView;
+    BioMaskSilhouette bioMaskSilhouette;
     @ColorInt Integer  currentColorBorder;
     private TextView tvStatus;
     RelativeLayout.LayoutParams lpStatus;
     private  View viewFlash;
-    private MaskView.MaskType maskType;
+    private BioMaskView.MaskType maskType;
     public RectF rectMask;
 
     // Bitmaps
@@ -348,48 +346,48 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
         addContentView(viewFlash, rp);
     }
 
-    private void insertMask(MaskView.MaskType maskType) {
+    private void insertMask(BioMaskView.MaskType maskType) {
 
         this.maskType = maskType;
 
-        if(maskView != null) {
-            ((ViewGroup) maskView.getParent()).removeView(maskView);
-            maskView = null;
+        if(bioMaskView != null) {
+            ((ViewGroup) bioMaskView.getParent()).removeView(bioMaskView);
+            bioMaskView = null;
         }
 
-        if(maskType == MaskView.MaskType.CLOSE) {
-            maskView = new MaskView(this, MaskView.MaskType.CLOSE, this);
+        if(maskType == BioMaskView.MaskType.CLOSE) {
+            bioMaskView = new BioMaskView(this, BioMaskView.MaskType.CLOSE, this);
         }else{
-            maskView = new MaskView(this, MaskView.MaskType.AFAR, this);
+            bioMaskView = new BioMaskView(this, BioMaskView.MaskType.AFAR, this);
         }
 
-        addContentView(maskView);
+        addContentView(bioMaskView);
 
     }
 
-    private void insertMask(MaskView.MaskType maskType, @ColorInt Integer  color) {
+    private void insertMask(BioMaskView.MaskType maskType, @ColorInt Integer  color) {
 
         currentColorBorder = color;
 
-        if(maskView != null) {
-            ((ViewGroup) maskView.getParent()).removeView(maskView);
-            maskView = null;
+        if(bioMaskView != null) {
+            ((ViewGroup) bioMaskView.getParent()).removeView(bioMaskView);
+            bioMaskView = null;
         }
 
-        maskView = new MaskView(this, maskType, this);
-        maskSilhouette = new MaskSilhouette(this, maskView, maskType, color);
+        bioMaskView = new BioMaskView(this, maskType, this);
+        bioMaskSilhouette = new BioMaskSilhouette(this, bioMaskView, maskType, color);
 
-        addContentView(maskView);
+        addContentView(bioMaskView);
     }
 
     private void insertSillhoutte(@ColorInt Integer color) {
 
-        if(maskSilhouette != null) {
-            ((ViewGroup) maskSilhouette.getParent()).removeView(maskSilhouette);
-            maskSilhouette = null;
+        if(bioMaskSilhouette != null) {
+            ((ViewGroup) bioMaskSilhouette.getParent()).removeView(bioMaskSilhouette);
+            bioMaskSilhouette = null;
         }
-        maskSilhouette = new MaskSilhouette(this, maskView, this.maskType, color);
-        addContentView(maskSilhouette);
+        bioMaskSilhouette = new BioMaskSilhouette(this, bioMaskView, this.maskType, color);
+        addContentView(bioMaskSilhouette);
 
     }
 
@@ -839,12 +837,12 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
     }
 
     private void flowClose() {
-        insertMask(MaskView.MaskType.CLOSE);
+        insertMask(BioMaskView.MaskType.CLOSE);
         insertTvStatus();
     }
 
     private void flowAfar(){
-        insertMask(MaskView.MaskType.AFAR);
+        insertMask(BioMaskView.MaskType.AFAR);
         insertSillhoutte(Color.WHITE);
         insertTvStatus();
         reopenCamera();
@@ -921,8 +919,8 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
                         Map<String, Float> mConfidenceAfar = tfBioReader.processImage(bitmapAfarSmiling);
 
                         BioLivenessValidate bioLivenessValidate = new BioLivenessValidate(mConfidenceClose, mConfidenceAfar, userIsSmilling(), userIsBlinking(), startDateOfProcess);
-                        HashMap<String, String> result = bioLivenessValidate.getLivenessResultDescription();
-                        System.out.println(result);
+                        HashMap<String, String> resultLiveness = bioLivenessValidate.getLivenessResultDescription();
+                        sendRequestLiveness(resultLiveness);
 
                        // result.put("bitmapClose", base64Close);
                         //result.put("bitmapAfar", base64Afar);
@@ -931,7 +929,7 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
 
                         Intent intent = new Intent(SelfieActivity.this, SimpleViewActivity.class);
                         intent.putExtra(CustomFragment.FRAGMENT, ResultFragment.class);
-                        intent.putExtra("livenessResult", result);
+                        intent.putExtra("result", resultLiveness);
                         intent.putExtra("bitmapClose", bitClose);
                         intent.putExtra("bitmapAfar", bitAfar);
                         startActivity(intent);
@@ -964,12 +962,41 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
         }
     }
 
+    private void sendRequestLiveness (HashMap<String, String> resultLiveness) {
+
+        Float Score = Float.valueOf(resultLiveness.get("Score"));
+        Boolean LivenessClose = Boolean.valueOf(resultLiveness.get("isLiveClose"));
+        Boolean LivenessAway = Boolean.valueOf(resultLiveness.get("isLiveAway"));
+        Float ScoreClose = Float.valueOf(resultLiveness.get("ScoreClose"));
+        Float ScoreAway = Float.valueOf(resultLiveness.get("ScoreAway"));
+        Integer Time = Integer.valueOf(resultLiveness.get("Time"));
+        Boolean IsBlinking = userIsBlinking();
+        Boolean IsSmilling = userIsSmilling();
+
+        LivenessRequest request = new LivenessRequest();
+        request.setUserName("Matheus Domingos");
+        request.setUserCPF("09870360920");
+        request.setScore(Score);
+        request.setScoreClose(ScoreClose);
+        request.setIsLiveClose(LivenessClose);
+        request.setScoreAway(ScoreAway);
+        request.setIsLiveAway(LivenessAway);
+        request.setIsBlinking(IsBlinking);
+        request.setIsSmilling(IsSmilling);
+        request.setDeviceModel("ANDROID");
+        request.setBase64Center(base64Close);
+        request.setBase64Away(base64Afar);
+        request.setIsResetSession(false);
+        request.setAttemptsValidate(1);
+        request.setIsResetSessionSpoofing(false);
+        request.setAttemptsSpoofing(1);
+        request.setTimeTotal(Time);
+
+        BioLivenessService bioLivenessService = new BioLivenessService();
+        bioLivenessService.sendLiveness(request);
 
 
-
-
-
-
+    }
 
     private ByteBuffer convertBitmapToByteBuffer(Bitmap pBitmap) {
 
@@ -1053,7 +1080,6 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
         }catch (Exception e) {
             System.out.println(e);
         }
-
 
 
         FaceInsertRequest request = new FaceInsertRequest();

@@ -16,6 +16,7 @@ import com.acesso.acessobiosample.R;
 import com.acesso.acessobiosample.activity.SelfieActivity;
 import com.orhanobut.hawk.Hawk;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -26,13 +27,18 @@ public class ResultFragment extends CustomFragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         View v;
+
+
         v = inflater.inflate(R.layout.fragment_liveness_success, null);
 
         Bundle b = getActivity().getIntent().getExtras();
 
         Intent intent = getActivity().getIntent();
-        Bitmap bitmapClose = (Bitmap) intent.getParcelableExtra("bitmapClose");
-        Bitmap bitmapAfar = (Bitmap) intent.getParcelableExtra("bitmapAfar");
+
+        HashMap<String, String> result = intent.getParcelableExtra("result");
+        Bitmap bitmapClose = intent.getParcelableExtra("bitmapClose");
+
+        Bitmap bitmapAfar = intent.getParcelableExtra("bitmapAfar");
 
         ImageView ivClose = ((ImageView) v.findViewById(R.id.ivClose));
         ivClose.setImageBitmap(bitmapClose);

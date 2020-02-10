@@ -4,28 +4,26 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Path;
 import android.view.View;
-import android.view.ViewGroup;
 
 import androidx.annotation.ColorInt;
 
-public class MaskSilhouette extends View {
+public class BioMaskSilhouette extends View {
 
     public Paint pStatus = new Paint();
-    private MaskView maskView;
-    private MaskView.MaskType maskType;
+    private BioMaskView bioMaskView;
+    private BioMaskView.MaskType maskType;
 
     @ColorInt
     public Integer  colorBorder;
 
-    public MaskSilhouette(Context context) {
+    public BioMaskSilhouette(Context context) {
         super(context);
     }
 
-    public MaskSilhouette(Context context, MaskView maskView, MaskView.MaskType maskType ,@ColorInt Integer  color) {
+    public BioMaskSilhouette(Context context, BioMaskView bioMaskView, BioMaskView.MaskType maskType , @ColorInt Integer  color) {
         super(context);
-        this.maskView = maskView;
+        this.bioMaskView = bioMaskView;
         this.maskType = maskType;
         this.colorBorder = color;
     }
@@ -42,10 +40,10 @@ public class MaskSilhouette extends View {
         pStatus.setStyle(Paint.Style.STROKE);
         pStatus.setStrokeWidth(10f);
 
-        if(this.maskType == MaskView.MaskType.CLOSE) {
-            canvas.drawRoundRect(maskView.maskClose(canvas),(maskView.maskClose(canvas).right / 2), (maskView.maskClose(canvas).right / 2), pStatus);
+        if(this.maskType == BioMaskView.MaskType.CLOSE) {
+            canvas.drawRoundRect(bioMaskView.maskClose(canvas),(bioMaskView.maskClose(canvas).right / 2), (bioMaskView.maskClose(canvas).right / 2), pStatus);
         }else{
-            canvas.drawRoundRect(maskView.maskAfar(canvas),(maskView.maskAfar(canvas).right / 2), (maskView.maskAfar(canvas).right / 2), pStatus);
+            canvas.drawRoundRect(bioMaskView.maskAfar(canvas),(bioMaskView.maskAfar(canvas).right / 2), (bioMaskView.maskAfar(canvas).right / 2), pStatus);
         }
 
     }

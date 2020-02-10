@@ -13,7 +13,7 @@ import androidx.annotation.RequiresApi;
 
 import com.acesso.acessobiosample.activity.SelfieActivity;
 
-public class MaskView extends View {
+public class BioMaskView extends View {
   private Paint mTransparentPaint;
   private Paint mSemiBlackPaint;
   private Path mPath = new Path();
@@ -27,24 +27,24 @@ public class MaskView extends View {
 
   public MaskType mType;
 
-  public MaskView(Context context) {
+  public BioMaskView(Context context) {
     super(context);
     initPaints();
   }
 
-  public MaskView(Context context, MaskType mType, SelfieActivity selfieActivity) {
+  public BioMaskView(Context context, MaskType mType, SelfieActivity selfieActivity) {
     super(context);
     this.mType = mType;
     this.selfieActivity = selfieActivity;
     initPaints();
   }
 
-  public MaskView(Context context, AttributeSet attrs) {
+  public BioMaskView(Context context, AttributeSet attrs) {
     super(context, attrs);
     initPaints();
   }
 
-  public MaskView(Context context, AttributeSet attrs, int defStyleAttr) {
+  public BioMaskView(Context context, AttributeSet attrs, int defStyleAttr) {
     super(context, attrs, defStyleAttr);
     initPaints();
   }

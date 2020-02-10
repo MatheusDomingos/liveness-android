@@ -11,6 +11,8 @@ import com.acesso.acessobiosample.dto.GetAuthTokenResponse;
 import com.acesso.acessobiosample.dto.GetProcessByUserResponse;
 import com.acesso.acessobiosample.dto.GetProcessResponse;
 import com.acesso.acessobiosample.dto.GetSubjectResponse;
+import com.acesso.acessobiosample.dto.LivenessRequest;
+import com.acesso.acessobiosample.dto.LivenessResponse;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -40,6 +42,7 @@ public interface BioService {
     Call<FaceInsertResponse> faceInsert(@Path("process") String process,
                                         @Body FaceInsertRequest request);
 
+
     @POST("subject/{cpf}/authenticate")
     @Headers({"Content-Type: application/json;charset=UTF-8"})
     Call<AuthenticateResponse> authenticate(@Path("cpf") String cpf,
@@ -50,6 +53,11 @@ public interface BioService {
 
     @GET("process/{process}")
     Call<GetProcessResponse> getProcess(@Path("process") String process);
+
+    @POST("app/liveness/{process}")
+    @Headers({"Content-Type: application/json;charset=UTF-8"})
+    Call<LivenessResponse> liveness(@Path("process") String process,
+                                      @Body LivenessRequest request);
 
 
 

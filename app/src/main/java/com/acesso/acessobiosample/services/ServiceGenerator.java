@@ -13,14 +13,14 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ServiceGenerator {
 
-    public static final String API_BASE_URL_HML = "https://crediariohomolog.acesso.io/treinamento/services/v2/credService.svc/";
+    public static final String API_BASE_URL_HML = "https://crediariohomolog.acesso.io/blackpanther/services/v2/credService.svc/";
     public static final String API_BASE_URL_PRD = "https://www2.acesso.io/seres/services/v2/credService.svc/";
 
     private static OkHttpClient.Builder httpClientBuilder = new OkHttpClient.Builder();
     private static OkHttpClient okHttpClient;
 
     private static Retrofit.Builder builder = new Retrofit.Builder()
-                                                    .baseUrl((String) Hawk.get(SharedKey.INSTANCE))
+                                                    .baseUrl(API_BASE_URL_HML)
                                                     .addConverterFactory(GsonConverterFactory.create());
 
     private static final List<Protocol> protocols = Arrays.asList(Protocol.HTTP_1_1);
@@ -28,14 +28,13 @@ public class ServiceGenerator {
     private static Retrofit retrofit = builder.build();
 
     public static <S> S createService(Class<S> serviceClass) {
-        return createService(serviceClass, false, Hawk.get(SharedKey.INSTANCE));
+        return createService(serviceClass, false, API_BASE_URL_HML);
     }
 
     public static <S> S createService(Class<S> serviceClass, boolean auth, String url) {
 
-
         builder = new Retrofit.Builder()
-                .baseUrl(url)
+                .baseUrl(API_BASE_URL_HML)
                 .addConverterFactory(GsonConverterFactory.create());
 
         AuthenticationInterceptor interceptor = new AuthenticationInterceptor(auth);

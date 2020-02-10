@@ -13,7 +13,7 @@ public class AuthenticationInterceptor implements Interceptor {
 
     private static boolean auth = false;
 
-    private static final String API_KEY = "7E426BC2-652E-4BCE-B6A1-7922FA44EBC9";
+    private static final String API_KEY = "f968978f-1417-4d11-8dc4-59477deb3d36";
 
     public AuthenticationInterceptor(boolean auth) {
         this.auth = auth;
