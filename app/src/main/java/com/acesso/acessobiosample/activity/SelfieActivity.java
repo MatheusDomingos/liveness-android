@@ -192,8 +192,6 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
 
     private boolean quant = false;
 
-
-
     // Mask dinamiccally
     BioMaskView bioMaskView;
     BioMaskSilhouette bioMaskSilhouette;
@@ -216,7 +214,10 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
         CLOSE , AFAR, SMILE, SMILE_ERROR
     }
     // Started with Flow.CLOSE flow
-    private  Flow flow = Flow.CLOSE;
+    private  Flow currentFlow = Flow.CLOSE;
+
+    boolean isEnterSmiling = false;
+
     private boolean isChangeFlow = true;
 
     List<Float> arrLeftEyeOpenProbability = new ArrayList<Float>();
@@ -492,10 +493,16 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
                               //  if (DEBUG) {
                                     Log.d(TAG, "Entre olhos: " + diffEye);
                                     Log.d(TAG, "Olho esquerdo (X): " + leftEyePosX);
-                                    Log.d(TAG, "Olho esquerdo (Y): " + leftEyePosY);
                                     Log.d(TAG, "Olho direito (X): " + rightEyePosX);
-                                    Log.d(TAG, "Olho direito (Y): " + rightEyePosY);
-                              //  }
+                             //   }
+
+
+                                Log.d(TAG, "Linha vertical esquerda: " + posVerticalLineLeft);
+                                Log.d(TAG, "Linha vertical direita: " + posVerticalLineRight);
+                                Log.d(TAG, "Atura dos olhos (Y): " + leftEyePosY);
+                               // Log.d(TAG, "Olho direito (Y): " + rightEyePosY);
+                                Log.d(TAG, "Linha horizontal acima: " + posHorizontalLineTop);
+                                Log.d(TAG, "Linha horizontal abaixo: " + posHorizontalLineBottom);
 
                                 // Olhos fora do enquadramento na horizontal
                                 if (leftEyePosX < posVerticalLineLeft || rightEyePosX > posVerticalLineRight) {
@@ -595,10 +602,10 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
 
             // Estipulo o tempo de espera do timer. Se for o processo de sorriso, faço a captura de imediato.
             long waitingTime;
-            if(flow == Flow.SMILE) {
-                waitingTime = 1000;
+            if(currentFlow == Flow.SMILE) {
+                waitingTime = 600;
             }else{
-                waitingTime = 2000;
+                waitingTime = 1000;
             }
 
             countDownTimer = new CountDownTimer(waitingTime, 1000) {
@@ -614,10 +621,10 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
                         isRequestImage = true;
                         destroyTimer();
 
-                        if(flow == Flow.CLOSE || flow == Flow.SMILE) {
+                        if(currentFlow == Flow.CLOSE || currentFlow == Flow.SMILE) {
                             fireFlash();
                             takePicture();
-                        }else if (flow == Flow.AFAR) {
+                        }else if (currentFlow == Flow.AFAR) {
                             changeTheFlow();
                         }
 
@@ -672,9 +679,13 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
             insertSillhoutte(colorGreen);
 
             //
-            if(flow == Flow.SMILE) {
+            if(currentFlow == Flow.SMILE) {
                 tvStatus.setTextColor(colorGreen);
-                tvStatus.setText(getString(R.string.status_smile));
+                if(isEnterSmiling) {
+                    tvStatus.setText(getString(R.string.status_stop_smile));
+                }else{
+                    tvStatus.setText(getString(R.string.status_smile));
+                }
             }else{
                 tvStatus.setText(getString(R.string.status_success));
             }
@@ -684,11 +695,18 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
 
         if (autoCapture && countRegressive && !countDownCancelled[0]) {
 
-            if(flow ==  Flow.SMILE) {
+            if(currentFlow ==  Flow.SMILE) {
 
-                if(userIsSmilling()) {
-                    createTimer();
+                if(isEnterSmiling) {
+                    if(!userIsSmilling()) {
+                        createTimer();
+                    }
+                }else{
+                    if(userIsSmilling()) {
+                        createTimer();
+                    }
                 }
+
 
             }else{
                 createTimer();
@@ -744,7 +762,7 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
             currentColorBorder = Color.WHITE;
             insertSillhoutte(Color.WHITE);
             tvStatus.setText(getString(R.string.status_error));
-            if(flow == Flow.SMILE) {
+            if(currentFlow == Flow.SMILE) {
                 tvStatus.setTextColor(primaryColor);
             }
         }
@@ -816,16 +834,16 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
             viewFlash = null;
         }
 
-        switch (flow){
+        switch (currentFlow){
 
             case CLOSE:
-                flow  = Flow.AFAR;
+                currentFlow  = Flow.AFAR;
                 currentColorBorder = Color.WHITE;
                 flowAfar();
                 break;
             case AFAR:
                 isRequestImage = false;
-                flow = Flow.SMILE;
+                currentFlow = Flow.SMILE;
                 currentColorBorder = Color.WHITE;
                 flowSmile();
                 break;
@@ -848,48 +866,55 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
         reopenCamera();
     }
 
-    public void initParamsBio (RectF rectF) {
+    public void setParamsBio (RectF rectF) {
         if(isChangeFlow){
             isChangeFlow = false;
             this.rectMask = rectF;
-            if(flow == Flow.CLOSE) {
+            if(currentFlow == Flow.CLOSE) {
                 paramsBioClose();
             }else{
                 paramsBioAfar();
             }
         }
-
     }
 
     private void paramsBioClose(){
 
         // This condition verify wether the flow is close and different of smile error. Then the startTime is initialized.
-        if(flow == Flow.CLOSE && flow != Flow.SMILE_ERROR) {
+        if(currentFlow == Flow.CLOSE && currentFlow != Flow.SMILE_ERROR) {
             startDateOfProcess = Calendar.getInstance().getTime();
         }
 
         minDiffEye = 160f;
         maxDiffEye = 240f;
-        posVerticalLineLeft = this.rectMask.left;
-        posVerticalLineRight = this.rectMask.right;
+        posVerticalLineLeft = this.rectMask.left - 200;
+        posVerticalLineRight = this.rectMask.right - 200;
         posHorizontalLineTop = this.rectMask.top + 200f;
-        posHorizontalLineBottom = this.rectMask.bottom - 200f;
+        posHorizontalLineBottom = this.rectMask.bottom + 200f;
     }
 
     private void paramsBioAfar(){
         markRed();
         minDiffEye = 80f;
         maxDiffEye = 160f;
-        posVerticalLineLeft = this.rectMask.left;
-        posVerticalLineRight = this.rectMask.right;
-        posHorizontalLineTop = this.rectMask.top + 200f;
-        posHorizontalLineBottom = this.rectMask.bottom - 200f;
+        posVerticalLineLeft = this.rectMask.left - 200;
+        posVerticalLineRight = this.rectMask.right - 200;
+        posHorizontalLineTop = this.rectMask.top - 200;
+        posHorizontalLineBottom = this.rectMask.bottom - (getHeightPixels() / 3); // No de longe eu vejo a linha horizontal de baixo e diminuo com o 1/3 da tela (o tamanho do frame do rosto).
     }
 
 
     private void flowSmile() {
         userIsBlinking();
-        tvStatus.setText(getString(R.string.status_smile));
+
+        isEnterSmiling = userIsSmilling();
+
+        if(isEnterSmiling) {
+            tvStatus.setText(getString(R.string.status_stop_smile));
+        }else{
+            tvStatus.setText(getString(R.string.status_smile));
+        }
+
         tvStatus.setTextColor( ResourcesCompat.getColor(getResources(), R.color.colorGreenMaskBorder, null));
     }
 
@@ -907,10 +932,10 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
                 @Override
                 public void run() {
 
-                    if(flow == Flow.CLOSE) {
+                    if(currentFlow == Flow.CLOSE) {
                         bitmapClose = bitmap;
                         base64Close = base64;
-                    }else if(flow == Flow.SMILE) {
+                    }else if(currentFlow == Flow.SMILE) {
                         bitmapAfarSmiling = bitmap;
                         base64Afar = base64;
 
@@ -929,6 +954,9 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
 
                         Intent intent = new Intent(SelfieActivity.this, SimpleViewActivity.class);
                         intent.putExtra(CustomFragment.FRAGMENT, ResultFragment.class);
+
+                        Boolean IsLiveness = "1".equals(resultLiveness.get("isLiveness"));
+                        intent.putExtra("isLiveness", IsLiveness);
                         intent.putExtra("result", resultLiveness);
                         intent.putExtra("bitmapClose", bitClose);
                         intent.putExtra("bitmapAfar", bitAfar);
@@ -965,6 +993,7 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
     private void sendRequestLiveness (HashMap<String, String> resultLiveness) {
 
         Float Score = Float.valueOf(resultLiveness.get("Score"));
+        Boolean IsLiveness =  Boolean.valueOf(resultLiveness.get("isLiveness"));
         Boolean LivenessClose = Boolean.valueOf(resultLiveness.get("isLiveClose"));
         Boolean LivenessAway = Boolean.valueOf(resultLiveness.get("isLiveAway"));
         Float ScoreClose = Float.valueOf(resultLiveness.get("ScoreClose"));
@@ -977,6 +1006,7 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
         request.setUserName("Matheus Domingos");
         request.setUserCPF("09870360920");
         request.setScore(Score);
+        request.setIsLIve(IsLiveness);
         request.setScoreClose(ScoreClose);
         request.setIsLiveClose(LivenessClose);
         request.setScoreAway(ScoreAway);

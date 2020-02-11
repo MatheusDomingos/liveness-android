@@ -28,35 +28,27 @@ public class ResultFragment extends CustomFragment {
 
         View v;
 
-
-        v = inflater.inflate(R.layout.fragment_liveness_success, null);
-
-        Bundle b = getActivity().getIntent().getExtras();
-
         Intent intent = getActivity().getIntent();
 
-        HashMap<String, String> result = intent.getParcelableExtra("result");
-        Bitmap bitmapClose = intent.getParcelableExtra("bitmapClose");
+        Boolean isLiveness = intent.getBooleanExtra("isLiveness", true);
 
-        Bitmap bitmapAfar = intent.getParcelableExtra("bitmapAfar");
+        if(isLiveness) {
 
-        ImageView ivClose = ((ImageView) v.findViewById(R.id.ivClose));
-        ivClose.setImageBitmap(bitmapClose);
+            v = inflater.inflate(R.layout.fragment_liveness_success, null);
 
-        ImageView ivAfar = ((ImageView) v.findViewById(R.id.ivAfar));
-        ivAfar.setImageBitmap(bitmapAfar);
+            Bitmap bitmapClose = intent.getParcelableExtra("bitmapClose");
+            Bitmap bitmapAfar = intent.getParcelableExtra("bitmapAfar");
 
-//        if (b != null) {
-//            livenessResult = b.getParcelable("livenessResult");
-//        }
-//
-//        String isLive  =  livenessResult.get("isLive");
-//
-//        if(isLive.equals("1")) {
-//            v = inflater.inflate(R.layout.fragment_liveness_success, null);
-//        }else{
-//            v = inflater.inflate(R.layout.fragment_liveness_success, null);
-//        }
+            ImageView ivClose = ((ImageView) v.findViewById(R.id.ivClose));
+            ivClose.setImageBitmap(bitmapClose);
+
+            ImageView ivAfar = ((ImageView) v.findViewById(R.id.ivAfar));
+            ivAfar.setImageBitmap(bitmapAfar);
+
+        }else{
+            v = inflater.inflate(R.layout.fragment_liveness_error, null);
+        }
+
 
         Hawk.init(getActivity()).build();
 

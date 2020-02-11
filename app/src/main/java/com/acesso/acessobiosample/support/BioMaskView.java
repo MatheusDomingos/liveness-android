@@ -63,19 +63,21 @@ public class BioMaskView extends View {
     float width = canvas.getWidth() - x;
     float height =  ((float )getHeight() / 2) + 60; // (2/4 + 60) Aumentei 60 compensando a label de status e aumentando um pouco o tamanho de 2/4 ta tela.
     float y = (height / 2) ;
-    RectF rectF = new RectF(x, y  ,width, (height + y));
-    this.selfieActivity.initParamsBio(rectF);
+    RectF rectF = new RectF(x, y,width, (height + y));
+    this.selfieActivity.setParamsBio(rectF);
     return  rectF;// x, y, width, height; (height + y) pois um lado achata o outro.
   }
 
   public RectF maskAfar(Canvas canvas) {
-    float screenHeight = canvas.getHeight();
+    float screenHeight = getHeight();
+    float screenWidht = getWidth();
     float x = (float) (getWidth() / 3.5);
     float width = canvas.getWidth() - x;
     float height =  (((float )getHeight() / 3) ) + 60;
     float y = (screenHeight / 2) - (height / 2) ;
-      RectF rectF = new RectF(x, y  ,width, (height + y));
-      this.selfieActivity.initParamsBio(rectF);
+ //   float y =  (height / 2) ;
+      RectF rectF = new RectF(x, y, width, (height + y));
+      this.selfieActivity.setParamsBio(rectF);
     return rectF; // x, y, width, height; (height + y) pois um lado achata o outro.
   }
 
