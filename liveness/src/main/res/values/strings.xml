@@ -1,0 +1,52 @@
+<resources>
+    <string name="app_name">liveness</string>
+
+    <string name="camera_error">Este dispositivo não suporta a API Camera 2.</string>
+
+    <string name="wait">Aguarde...</string>
+
+    <string name="error_field_required">Preencha este campo</string>
+    <string name="error_invalid_cpf">CPF informado é inválido</string>
+    <string name="error_invalid_email">E-mail informado é inválido</string>
+    <string name="error_invalid_celular">Celular informado é inválido</string>
+
+    <!-- Mask Status -->
+    <string name="status_success">Aguarde</string>
+    <string name="status_error">Enquadre seu rosto no contorno</string>
+    <string name="status_smile">Agora sorria</string>
+    <string name="status_stop_smile">Agora pare de sorrir</string>
+
+    <!-- fragment Welcome -->
+    <string name="label_welcome">Seja bem vindo</string>
+    <string name="label_welcome_description">Esse é o aplicativo de testes de Biometria Facial Liveness da Acesso Digital</string>
+    <string name="label_button_start">Iniciar teste</string>
+
+    <!-- fragment Welcome -->
+    <string name="label_button_take">Tirar foto</string>
+    <string name="label_title_intro">Vamos precisar de sua foto</string>
+    <string name="label_descrption_intro">Centralize o rosto no contorno até ficar
+verde e siga as instruções na tela</string>
+
+    <!-- fragment Success Liveness -->
+    <string name="label_liveness_success">Biometria capturada\ncom sucesso!</string>
+    <string name="label_give_feedback">Dar feedback</string>
+    <string name="label_exit">Sair</string>
+
+
+    <!-- fragment Error Liveness -->
+    <string name="label_liveness_error">Ops! Não foi possível \nverificar sua biometria.</string>
+    <string name="label_liveness_description_error">Alguma coisa deu errado durante os testes.
+    Vamos começar do início? Atente-se as instruções durante as fotos.</string>
+    <string name="label_tryagain">Tentar novamente</string>
+
+
+    <!-- Custom Dialog -->
+    <string name="dialog_default_title">Here\'s a message!</string>
+    <string name="dialog_ok">OK</string>
+    <string name="dialog_cancel">Cancel</string>
+    <string name="LOADING">Loading...</string>
+
+    <string name="yes">SIM</string>
+    <string name="understood">OK, ENTENDI</string>
+    <string name="no">NÃO</string>
+</resources>

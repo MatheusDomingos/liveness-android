@@ -1,15 +1,12 @@
-package com.acesso.acessobiosample.fragment;
+package com.acessobio.liveness.fragment;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.media.Image;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -18,13 +15,10 @@ import android.widget.LinearLayout;
 import androidx.annotation.Nullable;
 
 import com.acesso.acessobiosample.R;
-import com.acesso.acessobiosample.activity.FormViewActivity;
 import com.acesso.acessobiosample.activity.SelfieActivity;
 import com.orhanobut.hawk.Hawk;
 
 import java.util.Objects;
-
-import static androidx.core.content.ContextCompat.getSystemService;
 
 public class IntroFragment extends CustomFragment{
 
@@ -50,7 +44,6 @@ public class IntroFragment extends CustomFragment{
             public void onClick(View v) {
 
                // exibirMensagemEdt("Se identifique para o teste", "Insira seu nome");
-
 
                 Intent intent = new Intent(getActivity(), SelfieActivity.class);
                 startActivity(intent);

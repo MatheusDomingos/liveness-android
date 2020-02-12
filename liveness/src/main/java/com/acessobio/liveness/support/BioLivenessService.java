@@ -1,12 +1,12 @@
-package com.acesso.acessobiosample.support;
+package com.acessobio.liveness.support;
 
 import android.annotation.SuppressLint;
 import android.util.Log;
 
-import com.acesso.acessobiosample.dto.LivenessRequest;
-import com.acesso.acessobiosample.dto.LivenessResponse;
-import com.acesso.acessobiosample.services.BioService;
-import com.acesso.acessobiosample.services.ServiceGenerator;
+import com.acessobio.liveness.dto.LivenessRequest;
+import com.acessobio.liveness.dto.LivenessResponse;
+import com.acessobio.liveness.services.BioService;
+import com.acessobio.liveness.services.ServiceGenerator;
 
 import org.json.JSONException;
 import org.json.JSONObject;

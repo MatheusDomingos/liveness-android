@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity.SelfieActivity"
+    android:id="@+id/root_view"
+    android:background="@color/colorBlack"
+    android:padding="0dp"
+    android:layout_margin="0dp">
+
+    <com.acesso.acessobiosample.utils.camera.AutoFitTextureView
+        android:id="@+id/texture"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+
+        />
+
+    <!-- Capture Stillshot Button -->
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="@dimen/cam_widget_margin_bottom"
+        android:padding="@dimen/cam_content_inset_primary"
+        android:background="@drawable/circle_opaque"
+        android:id="@+id/capture_button_container">
+
+
+    </RelativeLayout>
+
+
+
+    <ImageView
+        android:id="@+id/rectangle"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/rectangle"/>
+
+
+</RelativeLayout>
