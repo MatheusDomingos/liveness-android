@@ -1,9 +1,11 @@
 package com.acesso.acessobiosample.fragment;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.media.Image;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -15,7 +17,10 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.acesso.acessobiosample.R;
 import com.acesso.acessobiosample.activity.FormViewActivity;
@@ -28,6 +33,8 @@ import java.util.Objects;
 import static androidx.core.content.ContextCompat.getSystemService;
 
 public class IntroFragment extends CustomFragment{
+
+    protected static final int REQUEST_CAMERA_PERMISSION = 1;
 
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_intro, null);
@@ -53,14 +60,45 @@ public class IntroFragment extends CustomFragment{
                // exibirMensagemEdt("Se identifique para o teste", "Insira seu nome");
 
                // LivenessX livenessX = LivenessX(getContext());
-                Intent intent = new Intent(getActivity(), SelfieActivity.class);
-                startActivity(intent);
 
+                if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
+                {
+
+                    requestPermissions(new String[] {
+                            Manifest.permission.CAMERA
+                    }, REQUEST_CAMERA_PERMISSION);
+
+                }
+                else {
+                    Intent intent = new Intent(getActivity(), SelfieActivity.class);
+                    startActivity(intent);
+                }
             }
         });
 
         return v;
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+
+        switch (requestCode) {
+            case REQUEST_CAMERA_PERMISSION: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+                    Intent intent = new Intent(getActivity(), SelfieActivity.class);
+                    startActivity(intent);
+                }
+                break;
+            }
+        }
+
+    }
+
+
+
 
     private void exibirMensagemEdt(String titulo, String texto){
 
