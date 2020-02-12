@@ -10,7 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.acesso.acessobiosample.R;
+import com.acessobio.liveness.R;
 import com.google.android.material.snackbar.Snackbar;
 
 import org.json.JSONObject;

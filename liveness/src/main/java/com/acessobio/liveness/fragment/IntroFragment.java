@@ -14,8 +14,8 @@ import android.widget.LinearLayout;
 
 import androidx.annotation.Nullable;
 
-import com.acesso.acessobiosample.R;
-import com.acesso.acessobiosample.activity.SelfieActivity;
+import com.acessobio.liveness.R;
+import com.acessobio.liveness.activity.SelfieActivity;
 import com.orhanobut.hawk.Hawk;
 
 import java.util.Objects;
@@ -47,6 +47,8 @@ public class IntroFragment extends CustomFragment{
 
                 Intent intent = new Intent(getActivity(), SelfieActivity.class);
                 startActivity(intent);
+
+
 
             }
         });

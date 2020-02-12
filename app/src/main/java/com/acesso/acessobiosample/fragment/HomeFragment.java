@@ -39,6 +39,7 @@ import retrofit2.Response;
 /**
  * Created by matheusdomingos on 25/07/17.
  */
+@SuppressWarnings("unchecked")
 public class HomeFragment extends CustomFragment {
 
     private RecyclerView rvProcess;

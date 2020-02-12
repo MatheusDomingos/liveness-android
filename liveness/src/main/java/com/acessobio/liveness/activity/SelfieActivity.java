@@ -3,7 +3,6 @@ package com.acessobio.liveness.activity;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -36,8 +35,6 @@ import androidx.core.content.res.ResourcesCompat;
 
 import com.acessobio.liveness.R;
 import com.acessobio.liveness.dto.LivenessRequest;
-import com.acessobio.liveness.fragment.CustomFragment;
-import com.acessobio.liveness.fragment.ResultFragment;
 import com.acessobio.liveness.support.BioLivenessService;
 import com.acessobio.liveness.support.BioLivenessValidate;
 import com.acessobio.liveness.support.BioMaskSilhouette;
@@ -72,10 +69,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 import org.tensorflow.lite.Interpreter;
 
@@ -944,16 +937,6 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
                         //result.put("bitmapAfar", base64Afar);
                         Bitmap bitClose = Bitmap.createScaledBitmap(bitmapClose, 200, 280, false);
                         Bitmap bitAfar = Bitmap.createScaledBitmap(bitmapAfarSmiling, 200, 280, false);
-
-                        Intent intent = new Intent(SelfieActivity.this, SimpleViewActivity.class);
-                        intent.putExtra(CustomFragment.FRAGMENT, ResultFragment.class);
-
-                        Boolean IsLiveness = "1".equals(resultLiveness.get("isLiveness"));
-                        intent.putExtra("isLiveness", IsLiveness);
-                        intent.putExtra("result", resultLiveness);
-                        intent.putExtra("bitmapClose", bitClose);
-                        intent.putExtra("bitmapAfar", bitAfar);
-                        startActivity(intent);
 
                     }
 
