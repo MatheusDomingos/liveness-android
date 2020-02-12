@@ -1,2 +1,35 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.acessobio.liveness" />
+    package="com.acessobio.liveness"
+    xmlns:tools="http://schemas.android.com/tools" >
+
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission
+        android:name="android.permission.READ_LOGS"
+        tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.READ_OWNER_DATA" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_OWNER_DATA" />
+    <uses-permission
+        android:name="android.permission.WRITE_SETTINGS"
+        tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <application>
+
+        <activity
+            android:name=".activity.SelfieActivity"
+            android:screenOrientation="portrait"
+            android:noHistory="true"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+    </application>
+
+
+
+</manifest>
+

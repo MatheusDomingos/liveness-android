@@ -52,7 +52,7 @@ public class IntroFragment extends CustomFragment{
 
                // exibirMensagemEdt("Se identifique para o teste", "Insira seu nome");
 
-               // LivenessX livenessX = LivenessX(getContext());
+              //  LivenessX livenessX = LivenessX(getActivity());
                 Intent intent = new Intent(getActivity(), SelfieActivity.class);
                 startActivity(intent);
 
