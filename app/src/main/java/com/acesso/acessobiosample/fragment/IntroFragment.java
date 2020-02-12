@@ -20,6 +20,7 @@ import androidx.annotation.Nullable;
 import com.acesso.acessobiosample.R;
 import com.acesso.acessobiosample.activity.FormViewActivity;
 import com.acesso.acessobiosample.activity.SelfieActivity;
+import com.acessobio.liveness.LivenessX;
 import com.orhanobut.hawk.Hawk;
 
 import java.util.Objects;
@@ -51,7 +52,7 @@ public class IntroFragment extends CustomFragment{
 
                // exibirMensagemEdt("Se identifique para o teste", "Insira seu nome");
 
-
+               // LivenessX livenessX = LivenessX(getContext());
                 Intent intent = new Intent(getActivity(), SelfieActivity.class);
                 startActivity(intent);
 
