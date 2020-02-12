@@ -11,7 +11,7 @@ import com.acesso.acessobiosample.R;
 /**
  * Created by matheusdomingos on 18/05/17.
  */
-public class SimpleViewActivity extends BaseActivity {
+public class SimpleViewActivity extends BaseActivity  {
 
     static public final String NAME_STATUS = "NAME_STATUS";
 

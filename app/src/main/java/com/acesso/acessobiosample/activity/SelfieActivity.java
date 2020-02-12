@@ -43,6 +43,7 @@ import com.acesso.acessobiosample.dto.LivenessRequest;
 import com.acesso.acessobiosample.fragment.CustomFragment;
 import com.acesso.acessobiosample.fragment.HomeFragment;
 import com.acesso.acessobiosample.fragment.ResultFragment;
+import com.acesso.acessobiosample.sdktest.LivenessX;
 import com.acesso.acessobiosample.services.BioService;
 import com.acesso.acessobiosample.services.ServiceGenerator;
 import com.acesso.acessobiosample.support.BioLivenessService;
@@ -79,6 +80,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -945,22 +947,38 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
 
                         BioLivenessValidate bioLivenessValidate = new BioLivenessValidate(mConfidenceClose, mConfidenceAfar, userIsSmilling(), userIsBlinking(), startDateOfProcess);
                         HashMap<String, String> resultLiveness = bioLivenessValidate.getLivenessResultDescription();
-                        sendRequestLiveness(resultLiveness);
 
-                       // result.put("bitmapClose", base64Close);
+                        Boolean IsLiveness = "1".equals(resultLiveness.get("isLiveness"));
+
+                        HashMap<String, String> callBackResult = new HashMap<>();
+                        callBackResult.put("isLiveness", resultLiveness.get("isLiveness"));
+                        callBackResult.put("base64", base64Afar);
+
+                        Intent resultIntent = new Intent();
+                        resultIntent.putExtra(LivenessX.RESULT_OK, callBackResult);
+                        setResult(Activity.RESULT_OK, resultIntent);
+                        finish();
+
+                         sendRequestLiveness(resultLiveness);
+
+                        // result.put("bitmapClose", base64Close);
                         //result.put("bitmapAfar", base64Afar);
+
+                      /*
                         Bitmap bitClose = Bitmap.createScaledBitmap(bitmapClose, 200, 280, false);
                         Bitmap bitAfar = Bitmap.createScaledBitmap(bitmapAfarSmiling, 200, 280, false);
 
                         Intent intent = new Intent(SelfieActivity.this, SimpleViewActivity.class);
                         intent.putExtra(CustomFragment.FRAGMENT, ResultFragment.class);
 
-                        Boolean IsLiveness = "1".equals(resultLiveness.get("isLiveness"));
                         intent.putExtra("isLiveness", IsLiveness);
                         intent.putExtra("result", resultLiveness);
                         intent.putExtra("bitmapClose", bitClose);
                         intent.putExtra("bitmapAfar", bitAfar);
                         startActivity(intent);
+
+                        */
+
 
                     }
 

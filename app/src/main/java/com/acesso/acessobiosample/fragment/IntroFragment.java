@@ -1,15 +1,14 @@
 package com.acesso.acessobiosample.fragment;
 
+import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.media.Image;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -18,16 +17,19 @@ import android.widget.LinearLayout;
 import androidx.annotation.Nullable;
 
 import com.acesso.acessobiosample.R;
-import com.acesso.acessobiosample.activity.FormViewActivity;
 import com.acesso.acessobiosample.activity.SelfieActivity;
-import com.acessobio.liveness.LivenessX;
+
+import com.acesso.acessobiosample.sdktest.LivenessX;
+import com.acesso.acessobiosample.sdktest.iLivenessX;
 import com.orhanobut.hawk.Hawk;
 
+import java.util.HashMap;
 import java.util.Objects;
 
-import static androidx.core.content.ContextCompat.getSystemService;
 
-public class IntroFragment extends CustomFragment{
+public class IntroFragment extends CustomFragment implements iLivenessX {
+
+    LivenessX livenessX;
 
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_intro, null);
@@ -51,10 +53,11 @@ public class IntroFragment extends CustomFragment{
             public void onClick(View v) {
 
                // exibirMensagemEdt("Se identifique para o teste", "Insira seu nome");
+                livenessX = new LivenessX(IntroFragment.this);
+                livenessX.openLivenessX(false);
 
-              //  LivenessX livenessX = LivenessX(getActivity());
-                Intent intent = new Intent(getActivity(), SelfieActivity.class);
-                startActivity(intent);
+//                Intent intent = new Intent(getActivity(), SelfieActivity.class);
+//                startActivity(intent);
 
             }
         });
@@ -89,4 +92,26 @@ public class IntroFragment extends CustomFragment{
 
     }
 
+    @Override
+    public void onResultLiveness(HashMap result) {
+
+    }
+
+    @Override
+    public void onError(String error) {
+        Log.d("IntroFragment", error);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode == LivenessX.REQUEST_LIVENESS) {
+            if (resultCode == Activity.RESULT_OK) {
+                HashMap<String, String> result = data.getParcelableExtra(LivenessX.RESULT_OK);
+                // TODO Update your TextView.
+            }
+        }
+
+    }
 }
