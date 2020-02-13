@@ -21,6 +21,7 @@ import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.params.StreamConfigurationMap;
+import android.icu.util.Currency;
 import android.media.Image;
 import android.media.ImageReader;
 import android.os.AsyncTask;
@@ -105,7 +106,7 @@ public class Camera2Base extends BaseCameraActivity implements View.OnClickListe
     protected float ASPECT_RATIO_ERROR_RANGE = 0.1f;
 
     protected String cameraId;
-    protected AutoFitTextureView textureView;
+    protected AutoFitTextureView textureViewLive;
 
     protected CameraCaptureSession captureSession;
     protected CameraDevice cameraDevice;
@@ -372,10 +373,10 @@ public class Camera2Base extends BaseCameraActivity implements View.OnClickListe
         // available, and "onSurfaceTextureAvailable" will not be called. In that case, we can open
         // a camera and start preview from here (otherwise, we wait until the surface is ready in
         // the SurfaceTextureListener).
-        if (textureView.isAvailable()) {
-            openCamera(textureView.getWidth(), textureView.getHeight());
+        if (textureViewLive.isAvailable()) {
+            openCamera(textureViewLive.getWidth(), textureViewLive.getHeight());
         } else {
-            textureView.setSurfaceTextureListener(surfaceTextureListener);
+            textureViewLive.setSurfaceTextureListener(surfaceTextureListener);
         }
     }
 
@@ -514,9 +515,9 @@ public class Camera2Base extends BaseCameraActivity implements View.OnClickListe
         int orientation = getResources().getConfiguration().orientation;
 
         if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            textureView.setAspectRatio(previewSize.getWidth(), previewSize.getHeight());
+            textureViewLive.setAspectRatio(previewSize.getWidth(), previewSize.getHeight());
         } else {
-            textureView.setAspectRatio(previewSize.getHeight(), previewSize.getWidth());
+            textureViewLive.setAspectRatio(previewSize.getHeight(), previewSize.getWidth());
         }
     }
 
@@ -701,13 +702,13 @@ public class Camera2Base extends BaseCameraActivity implements View.OnClickListe
         try {
 
             if (previewSize == null
-                    || textureView == null
+                    || textureViewLive == null
                     || cameraDevice == null
                     || imageReader == null
                     || imageReaderFace == null
                     || cameraDevice == null) return;
 
-            previewSurfaceTexture = textureView.getSurfaceTexture();
+            previewSurfaceTexture = textureViewLive.getSurfaceTexture();
 
             assert previewSurfaceTexture != null;
 
@@ -787,7 +788,7 @@ public class Camera2Base extends BaseCameraActivity implements View.OnClickListe
         if (DEBUG) { Log.d(TAG, "Configure transform"); }
 
         synchronized (dimensionLock) {
-            if (null == textureView || null == previewSize || null == activity) {
+            if (null == textureViewLive || null == previewSize || null == activity) {
                 return;
             }
 
@@ -812,7 +813,7 @@ public class Camera2Base extends BaseCameraActivity implements View.OnClickListe
                 matrix.postRotate(180, centerX, centerY);
             }
 
-            textureView.setTransform(matrix);
+            textureViewLive.setTransform(matrix);
         }
     }
 
