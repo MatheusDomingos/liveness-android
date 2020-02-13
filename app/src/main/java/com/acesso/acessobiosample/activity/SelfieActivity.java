@@ -959,7 +959,7 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
                         setResult(Activity.RESULT_OK, resultIntent);
                         finish();
 
-                         sendRequestLiveness(resultLiveness);
+                        // sendRequestLiveness(resultLiveness);
 
                         // result.put("bitmapClose", base64Close);
                         //result.put("bitmapAfar", base64Afar);

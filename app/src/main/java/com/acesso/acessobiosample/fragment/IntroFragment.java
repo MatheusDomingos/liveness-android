@@ -29,7 +29,7 @@ import java.util.Objects;
 
 public class IntroFragment extends CustomFragment implements iLivenessX {
 
-    LivenessX livenessX;
+    ;
 
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_intro, null);
@@ -52,12 +52,8 @@ public class IntroFragment extends CustomFragment implements iLivenessX {
             @Override
             public void onClick(View v) {
 
-               // exibirMensagemEdt("Se identifique para o teste", "Insira seu nome");
-                livenessX = new LivenessX(IntroFragment.this);
+                LivenessX livenessX = new LivenessX(IntroFragment.this);
                 livenessX.openLivenessX(false);
-
-//                Intent intent = new Intent(getActivity(), SelfieActivity.class);
-//                startActivity(intent);
 
             }
         });
@@ -103,11 +99,12 @@ public class IntroFragment extends CustomFragment implements iLivenessX {
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         if(requestCode == LivenessX.REQUEST_LIVENESS) {
             if (resultCode == Activity.RESULT_OK) {
+                assert data != null;
                 HashMap<String, String> result = data.getParcelableExtra(LivenessX.RESULT_OK);
                 // TODO Update your TextView.
             }

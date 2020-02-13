@@ -3,6 +3,7 @@ package com.acessobio.liveness.activity;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -33,6 +34,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.core.content.res.ResourcesCompat;
 
+import com.acessobio.liveness.LivenessX;
 import com.acessobio.liveness.R;
 import com.acessobio.liveness.dto.LivenessRequest;
 import com.acessobio.liveness.support.BioLivenessService;
@@ -71,6 +73,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.tensorflow.lite.Interpreter;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class SelfieActivity extends Camera2Base implements ImageProcessor, CaptureImageProcessor {
 
@@ -208,7 +214,7 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
 
     List<Float> arrLeftEyeOpenProbability = new ArrayList<Float>();
 
-   // This variable indicates the hour/minute/second of the begin process.
+    // This variable indicates the hour/minute/second of the begin process.
     Date startDateOfProcess;
 
     @SuppressLint("ResourceAsColor")
@@ -476,17 +482,17 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
                                 noseRange = (diffEye / 3);
                                 float maxDiffNose = (noseRange * (float)2.2);
 
-                              //  if (DEBUG) {
-                                    Log.d(TAG, "Entre olhos: " + diffEye);
-                                    Log.d(TAG, "Olho esquerdo (X): " + leftEyePosX);
-                                    Log.d(TAG, "Olho direito (X): " + rightEyePosX);
-                             //   }
+                                //  if (DEBUG) {
+                                Log.d(TAG, "Entre olhos: " + diffEye);
+                                Log.d(TAG, "Olho esquerdo (X): " + leftEyePosX);
+                                Log.d(TAG, "Olho direito (X): " + rightEyePosX);
+                                //   }
 
 
                                 Log.d(TAG, "Linha vertical esquerda: " + posVerticalLineLeft);
                                 Log.d(TAG, "Linha vertical direita: " + posVerticalLineRight);
                                 Log.d(TAG, "Atura dos olhos (Y): " + leftEyePosY);
-                               // Log.d(TAG, "Olho direito (Y): " + rightEyePosY);
+                                // Log.d(TAG, "Olho direito (Y): " + rightEyePosY);
                                 Log.d(TAG, "Linha horizontal acima: " + posHorizontalLineTop);
                                 Log.d(TAG, "Linha horizontal abaixo: " + posHorizontalLineBottom);
 
@@ -730,7 +736,7 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
         Arrays.sort(floatBlink, 0, floatBlink.length);
 
         if(floatBlink[floatBlink.length - 1] > 0.8f &&
-            floatBlink[0] < 0.5f && floatBlink[1] < 0.5f && floatBlink[2] < 0.5f){
+                floatBlink[0] < 0.5f && floatBlink[1] < 0.5f && floatBlink[2] < 0.5f){
             return true;
         }else{
             return false;
@@ -797,7 +803,7 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
             densityFactor = metrics.density;
 
             posVerticalLineLeft = (refWidth * (percentHorizontalRange / 100));
-           // posVerticalLineRight = (refWidth * ((percentHorizontalRange / 100) * 3)); - old version
+            // posVerticalLineRight = (refWidth * ((percentHorizontalRange / 100) * 3)); - old version
             posVerticalLineRight = (refWidth * ((percentHorizontalRange / 100) * 4));
             posHorizontalLineTop = topOffet;
             posHorizontalLineBottom = topOffet + heightRange;
@@ -925,18 +931,44 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
                         bitmapAfarSmiling = bitmap;
                         base64Afar = base64;
 
-                        TFBioReader tfBioReader = new TFBioReader(SelfieActivity.this, "perto.tflite", "longe.tflite");
+                        TFBioReader tfBioReader = new  TFBioReader(SelfieActivity.this, "perto.tflite", "longe.tflite");
                         Map<String, Float> mConfidenceClose = tfBioReader.processImage(bitmapClose);
                         Map<String, Float> mConfidenceAfar = tfBioReader.processImage(bitmapAfarSmiling);
 
                         BioLivenessValidate bioLivenessValidate = new BioLivenessValidate(mConfidenceClose, mConfidenceAfar, userIsSmilling(), userIsBlinking(), startDateOfProcess);
                         HashMap<String, String> resultLiveness = bioLivenessValidate.getLivenessResultDescription();
-                        sendRequestLiveness(resultLiveness);
 
-                       // result.put("bitmapClose", base64Close);
+                        Boolean IsLiveness = "1".equals(resultLiveness.get("isLiveness"));
+
+                        HashMap<String, String> callBackResult = new HashMap<>();
+                        callBackResult.put("isLiveness", resultLiveness.get("isLiveness"));
+                        callBackResult.put("base64", base64Afar);
+
+                        Intent resultIntent = new Intent();
+                        resultIntent.putExtra(LivenessX.RESULT_OK, callBackResult);
+                        setResult(Activity.RESULT_OK, resultIntent);
+                        finish();
+
+                        // sendRequestLiveness(resultLiveness);
+
+                        // result.put("bitmapClose", base64Close);
                         //result.put("bitmapAfar", base64Afar);
+
+                      /*
                         Bitmap bitClose = Bitmap.createScaledBitmap(bitmapClose, 200, 280, false);
                         Bitmap bitAfar = Bitmap.createScaledBitmap(bitmapAfarSmiling, 200, 280, false);
+
+                        Intent intent = new Intent(SelfieActivity.this, SimpleViewActivity.class);
+                        intent.putExtra(CustomFragment.FRAGMENT, ResultFragment.class);
+
+                        intent.putExtra("isLiveness", IsLiveness);
+                        intent.putExtra("result", resultLiveness);
+                        intent.putExtra("bitmapClose", bitClose);
+                        intent.putExtra("bitmapAfar", bitAfar);
+                        startActivity(intent);
+
+                        */
+
 
                     }
 
@@ -947,7 +979,7 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
             });
 
             //* String processId = Hawk.get(SharedKey.PROCESS, "");
-           //* String cpf = Hawk.get(SharedKey.CPF, "");
+            //* String cpf = Hawk.get(SharedKey.CPF, "");
 
 //            dialog = new SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE);
 //            dialog.getProgressHelper().setBarColor(Color.parseColor("#2980ff"));
@@ -956,8 +988,8 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
 //            dialog.show();
 
             // cadastro
-           //* if (processId != null && processId.trim().length() > 0) {
-               //* faceInsert(base64, processId);
+            //* if (processId != null && processId.trim().length() > 0) {
+            //* faceInsert(base64, processId);
             //*}
 
 
@@ -1040,7 +1072,6 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
         return byteBuffer;
     }
 
-
     public float[] convertByteToInt (byte[] byteArray) {
 
         ByteBuffer buffer = ByteBuffer.wrap(byteArray);
@@ -1052,59 +1083,6 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
 
         return floatArray;
     }
-
-
-
-    private void faceInsert(String base64, String processId) {
-
-        try {
-
-            byte[] imageAsBytes = Base64.decode(base64.getBytes(), Base64.DEFAULT);
-
-            Bitmap bitmap = BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length);
-            ByteBuffer byteBuffer = convertBitmapToByteBuffer(bitmap);
-
-            if(quant){
-                byte[][] result = new byte[1][2];
-                tflite.run(byteBuffer, result);
-                System.out.println(result);;
-            } else {
-                float [][] result = new float[1][2];
-                tflite.run(byteBuffer, result);
-                System.out.println(result);
-
-            }
-
-
-//            String[] inputs = {"fotoboa", "fotodefoto"};
-//
-//            float[][] labelProbArray = new float[1][inputs.length];
-//
-//            float[] x = convertByteToInt(imageAsBytes);
-//            tflite.run(x, labelProbArray);
-
-        }catch (Exception e) {
-            System.out.println(e);
-        }
-
-    }
-
-
-
-    private void alertDivergence(){
-        new SweetAlertDialog(this, SweetAlertDialog.WARNING_TYPE)
-                .setTitleText("Divergência")
-                .setContentText("Este cadastro possui ou está envolvido com um registro de divergência e foi enviado para a mesa de análise! Consulte o portal crediário.")
-                .setConfirmText("Entendi")
-                .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                    @Override
-                    public void onClick(SweetAlertDialog sDialog) {
-
-
-                    }
-                }).show();
-    }
-
 
 
     private void  alertError(String message){
