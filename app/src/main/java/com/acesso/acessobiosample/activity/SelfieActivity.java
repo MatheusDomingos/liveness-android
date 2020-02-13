@@ -257,6 +257,8 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
 
         setContentView(R.layout.activity_selfie);
 
+        textureView = findViewById(R.id.texture);
+
         autoCapture = Hawk.get(SharedKey.AUTOCAPTURE, true);
         countRegressive = Hawk.get(SharedKey.COUNT_REGRESSIVE, true);
 
