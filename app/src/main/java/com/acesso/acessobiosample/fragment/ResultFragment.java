@@ -35,7 +35,7 @@ public class ResultFragment extends CustomFragment {
 
         Boolean isLiveness = intent.getBooleanExtra("isLiveness", true);
 
-        if(isLiveness) {
+        if(!isLiveness) {
 
             v = inflater.inflate(R.layout.fragment_liveness_success, null);
 
@@ -82,6 +82,7 @@ public class ResultFragment extends CustomFragment {
                 @Override
                 public void onClick(View view) {
                     Intent intent = new Intent(getActivity(), SelfieActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
                 }
             });
