@@ -19,8 +19,10 @@ import androidx.annotation.Nullable;
 import com.acesso.acessobiosample.R;
 import com.acesso.acessobiosample.activity.SelfieActivity;
 
+
 import com.acessobio.liveness.LivenessX;
 import com.acessobio.liveness.iLivenessX;
+
 import com.orhanobut.hawk.Hawk;
 
 import java.util.HashMap;
