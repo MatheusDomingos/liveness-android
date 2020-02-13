@@ -74,10 +74,6 @@ import java.util.Map;
 
 import org.tensorflow.lite.Interpreter;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-
 public class SelfieActivity extends Camera2Base implements ImageProcessor, CaptureImageProcessor {
 
     public static final float COMPENSATION_EYE = 0.05f;
@@ -246,8 +242,6 @@ public class SelfieActivity extends Camera2Base implements ImageProcessor, Captu
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         setContentView(R.layout.activity_selfie);
-
-        textureView = findViewById(R.id.texture);
 
         autoCapture = Hawk.get(SharedKey.AUTOCAPTURE, true);
         countRegressive = Hawk.get(SharedKey.COUNT_REGRESSIVE, true);
