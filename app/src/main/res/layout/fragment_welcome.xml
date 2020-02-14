@@ -13,13 +13,13 @@
 
     <ImageView
         android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:src="@mipmap/logo_bio_white_full"
+        android:layout_height="83dp"
+        android:layout_marginTop="40dp"
         android:adjustViewBounds="true"
+        android:paddingLeft="110dp"
+        android:paddingRight="110dp"
         android:scaleType="fitCenter"
-        android:paddingLeft="120dp"
-        android:paddingRight="120dp"
-        android:layout_marginTop="40dp"/>
+        android:src="@mipmap/logo_bio_white_full" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -41,7 +41,7 @@
                 android:textColor="@android:color/white"
                 android:text="@string/label_welcome"
                 android:textStyle="bold"
-                android:textSize="22sp"/>
+                android:textSize="21sp"/>
 
             <TextView
                 android:layout_width="match_parent"
@@ -52,20 +52,20 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
                 android:text="@string/label_welcome_description"
-                android:textSize="14sp"/>
+                android:textSize="16sp"/>
 
         </LinearLayout>
 
         <Button
             android:id="@+id/btStart"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_height="50dp"
             android:background="@drawable/button_background_rounded"
             android:text="@string/label_button_start"
             android:textAllCaps="false"
             android:textColor="@android:color/white"
-            android:layout_marginStart="30dp"
-            android:layout_marginEnd="30dp"
+            android:layout_marginStart="40dp"
+            android:layout_marginEnd="40dp"
             android:layout_marginBottom="40dp"
             android:textSize="16sp"
             />

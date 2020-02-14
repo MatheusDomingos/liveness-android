@@ -35,7 +35,7 @@ public class ResultFragment extends CustomFragment {
 
         Boolean isLiveness = intent.getBooleanExtra("isLiveness", true);
 
-        if(!isLiveness) {
+        if(isLiveness) {
 
             v = inflater.inflate(R.layout.fragment_liveness_success, null);
 

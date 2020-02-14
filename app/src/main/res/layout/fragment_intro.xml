@@ -35,10 +35,10 @@
                 android:textColor="@color/colorIntroTitle"
                 android:text="@string/label_title_intro"
                 android:textStyle="normal"
-                android:textSize="18sp"/>
+                android:textSize="20sp"/>
             <ImageView
-                android:layout_width="23dp"
-                android:layout_height="23dp"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
                 android:layout_marginStart="5dp"
                 android:src="@drawable/ic_title_intro_cam"/>
 
@@ -50,11 +50,11 @@
             android:layout_height="wrap_content"
             android:textAlignment="center"
             android:textColor="@color/colorIntroDescription"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="40dp"
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
-            android:text="@string/label_welcome_description"
-            android:textSize="14sp"/>
+            android:text="@string/label_descrption_intro"
+            android:textSize="17sp"/>
 
     </LinearLayout>
 
@@ -79,13 +79,13 @@
         <Button
             android:id="@+id/btTakeIntro"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_height="50dp"
             android:background="@drawable/button_background_rounded"
             android:text="@string/label_button_take"
             android:textAllCaps="false"
             android:textColor="@android:color/white"
-            android:layout_marginStart="30dp"
-            android:layout_marginEnd="30dp"
+            android:layout_marginStart="40dp"
+            android:layout_marginEnd="40dp"
             android:layout_marginBottom="40dp"
             android:textSize="16sp"
             />
