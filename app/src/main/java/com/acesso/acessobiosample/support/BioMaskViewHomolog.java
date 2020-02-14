@@ -1,4 +1,4 @@
-package com.acesso.acessobiosample.support;
+package com.acessobio.liveness.support;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -9,9 +9,11 @@ import android.graphics.RectF;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.view.View;
+
 import androidx.annotation.RequiresApi;
 
-import com.acesso.acessobiosample.activity.SelfieActivity;
+import com.acessobio.liveness.activity.SelfieActivity;
+
 
 public class BioMaskView extends View {
   private Paint mTransparentPaint;

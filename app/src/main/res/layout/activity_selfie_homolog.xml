@@ -10,13 +10,12 @@
     android:padding="0dp"
     android:layout_margin="0dp">
 
-    <com.acesso.acessobiosample.utils.camera.AutoFitTextureView
-        android:id="@+id/textureNormal"
+    <com.acessobio.liveness.utils.camera.AutoFitTextureView
+        android:id="@+id/textureLive"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-
         />
 
     <!-- Capture Stillshot Button -->

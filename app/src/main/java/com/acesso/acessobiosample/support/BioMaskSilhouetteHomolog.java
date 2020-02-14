@@ -1,4 +1,4 @@
-package com.acesso.acessobiosample.support;
+package com.acessobio.liveness.support;
 
 import android.content.Context;
 import android.graphics.Canvas;
