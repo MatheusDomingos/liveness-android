@@ -7,19 +7,19 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class GetAuthTokenResponse {
+public class LivenessBillingResponse {
 
-    @SerializedName("GetAuthTokenResult")
-    private GetAuthTokenResult getAuthTokenResult;
-
-    @SerializedName("Token")
-    private String Token;
+    @SerializedName("Status")
+    private boolean Status;
 
     @SerializedName("Error")
     private Error error;
 
+    @SerializedName("Process")
+    private Error process;
+
     public boolean isValid() {
-        return error == null && getToken() != null;
+        return error == null;
     }
 
     public String getMessageError() {
@@ -29,12 +29,8 @@ public class GetAuthTokenResponse {
             message = error.getDescription();
         }
 
-        if (getAuthTokenResult != null && getAuthTokenResult.getError() != null) {
-            message = getAuthTokenResult.getError().getDescription();
-        }
-
         if (message == null || message.isEmpty()) {
-            message = "Erro ao recuperar token";
+            message = "Erro ao inserir face";
         }
 
         return message;

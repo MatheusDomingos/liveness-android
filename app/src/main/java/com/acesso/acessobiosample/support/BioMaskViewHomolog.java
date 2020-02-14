@@ -1,4 +1,4 @@
-package com.acessobio.liveness.support;
+package com.acesso.acessobiosample.support;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -8,20 +8,22 @@ import android.graphics.Path;
 import android.graphics.RectF;
 import android.os.Build;
 import android.util.AttributeSet;
+import android.util.Size;
 import android.view.View;
 
 import androidx.annotation.RequiresApi;
 
-import com.acessobio.liveness.activity.SelfieActivity;
+import com.acesso.acessobiosample.activity.homolog.SelfieActivityHomolog;
 
 
-public class BioMaskView extends View {
+public class BioMaskViewHomolog extends View {
   private Paint mTransparentPaint;
   private Paint mSemiBlackPaint;
   private Path mPath = new Path();
-
+  private Size previewSize;
   Canvas canvasGlobal = new Canvas();
-  SelfieActivity selfieActivity;
+  SelfieActivityHomolog selfieActivity;
+  private float aspectRatioRelative;
 
   public enum MaskType {
       CLOSE , AFAR
@@ -29,24 +31,34 @@ public class BioMaskView extends View {
 
   public MaskType mType;
 
-  public BioMaskView(Context context) {
+  public BioMaskViewHomolog(Context context) {
     super(context);
     initPaints();
   }
 
-  public BioMaskView(Context context, MaskType mType, SelfieActivity selfieActivity) {
+  public BioMaskViewHomolog(Context context, MaskType mType, SelfieActivityHomolog selfieActivity) {
     super(context);
     this.mType = mType;
     this.selfieActivity = selfieActivity;
     initPaints();
   }
 
-  public BioMaskView(Context context, AttributeSet attrs) {
+
+  public BioMaskViewHomolog(Context context, MaskType mType, SelfieActivityHomolog selfieActivity, Size previewSize, float aspectRatioRelative) {
+    super(context);
+    this.mType = mType;
+    this.selfieActivity = selfieActivity;
+    this.previewSize = previewSize;
+    this.aspectRatioRelative = aspectRatioRelative;
+    initPaints();
+  }
+
+  public BioMaskViewHomolog(Context context, AttributeSet attrs) {
     super(context, attrs);
     initPaints();
   }
 
-  public BioMaskView(Context context, AttributeSet attrs, int defStyleAttr) {
+  public BioMaskViewHomolog(Context context, AttributeSet attrs, int defStyleAttr) {
     super(context, attrs, defStyleAttr);
     initPaints();
   }
@@ -71,15 +83,15 @@ public class BioMaskView extends View {
   }
 
   public RectF maskAfar(Canvas canvas) {
-    float screenHeight = getHeight();
-    float screenWidht = getWidth();
-    float x = (float) (getWidth() / 3.5);
-    float width = canvas.getWidth() - x;
-    float height =  (((float )getHeight() / 3) ) + 60;
+    float screenHeight = previewSize.getWidth();
+    float screenWidht = previewSize.getHeight();
+    float x = (float) (screenWidht / 3.5);
+    float width = screenWidht - x;
+    float height =  (float)(screenHeight / 2.5) ;
     float y = (screenHeight / 2) - (height / 2) ;
  //   float y =  (height / 2) ;
-      RectF rectF = new RectF(x, y, width, (height + y));
-      this.selfieActivity.setParamsBio(rectF);
+    RectF rectF = new RectF(x * this.aspectRatioRelative , y * this.aspectRatioRelative, width * this.aspectRatioRelative, (height + y) * this.aspectRatioRelative);
+    this.selfieActivity.setParamsBio(rectF);
     return rectF; // x, y, width, height; (height + y) pois um lado achata o outro.
   }
 

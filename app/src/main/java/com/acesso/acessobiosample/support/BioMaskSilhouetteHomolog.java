@@ -1,4 +1,4 @@
-package com.acessobio.liveness.support;
+package com.acesso.acessobiosample.support;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -8,20 +8,20 @@ import android.view.View;
 
 import androidx.annotation.ColorInt;
 
-public class BioMaskSilhouette extends View {
+public class BioMaskSilhouetteHomolog extends View {
 
     public Paint pStatus = new Paint();
-    private BioMaskView bioMaskView;
-    private BioMaskView.MaskType maskType;
+    private BioMaskViewHomolog bioMaskView;
+    private BioMaskViewHomolog.MaskType maskType;
 
     @ColorInt
     public Integer  colorBorder;
 
-    public BioMaskSilhouette(Context context) {
+    public BioMaskSilhouetteHomolog(Context context) {
         super(context);
     }
 
-    public BioMaskSilhouette(Context context, BioMaskView bioMaskView, BioMaskView.MaskType maskType , @ColorInt Integer  color) {
+    public BioMaskSilhouetteHomolog(Context context, BioMaskViewHomolog bioMaskView, BioMaskViewHomolog.MaskType maskType , @ColorInt Integer  color) {
         super(context);
         this.bioMaskView = bioMaskView;
         this.maskType = maskType;
@@ -40,7 +40,7 @@ public class BioMaskSilhouette extends View {
         pStatus.setStyle(Paint.Style.STROKE);
         pStatus.setStrokeWidth(10f);
 
-        if(this.maskType == BioMaskView.MaskType.CLOSE) {
+        if(this.maskType == BioMaskViewHomolog.MaskType.CLOSE) {
             canvas.drawRoundRect(bioMaskView.maskClose(canvas),(bioMaskView.maskClose(canvas).right / 2), (bioMaskView.maskClose(canvas).right / 2), pStatus);
         }else{
             canvas.drawRoundRect(bioMaskView.maskAfar(canvas),(bioMaskView.maskAfar(canvas).right / 2), (bioMaskView.maskAfar(canvas).right / 2), pStatus);

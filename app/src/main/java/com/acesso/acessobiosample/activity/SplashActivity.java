@@ -39,6 +39,7 @@ public class SplashActivity extends AppCompatActivity {
         Hawk.put(SharedKey.AUTOCAPTURE, true);
         Hawk.put(SharedKey.COUNT_REGRESSIVE, true);
 
+
         final int SPLASH_DISPLAY_LENGTH = 1000;
         handle.postDelayed(new Runnable() {
             @Override
@@ -75,7 +76,7 @@ public class SplashActivity extends AppCompatActivity {
 
 
         ServiceGenerator
-                .createService(BioService.class, true, null)
+                .createService(BioService.class, true, "https://www2.acesso.io/seres/services/v3/acessoservice.svc/")
                 .getAuthToken()
                 .enqueue(new Callback<GetAuthTokenResponse>() {
 
@@ -86,8 +87,7 @@ public class SplashActivity extends AppCompatActivity {
 
                         if (body != null && body.isValid()) {
 
-
-                            Hawk.put(SharedKey.AUTH_TOKEN, body.getGetAuthTokenResult().getAuthToken());
+                            Hawk.put(SharedKey.AUTH_TOKEN, body.getToken());
 
                             Intent intent;
                             intent = new Intent(SplashActivity.this, SimpleViewActivity.class);

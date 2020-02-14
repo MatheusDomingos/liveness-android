@@ -14,7 +14,9 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class ServiceGenerator {
 
     public static final String API_BASE_URL_HML = "https://crediariohomolog.acesso.io/blackpanther/services/v2/credService.svc/";
-    public static final String API_BASE_URL_PRD = "https://www2.acesso.io/seres/services/v2/credService.svc/";
+    public static final String API_BASE_URL_PRD = "https://www2.acesso.io/seres/services/v3/acessoservice.svc/";
+
+    private String instanceURL = "";
 
     private static OkHttpClient.Builder httpClientBuilder = new OkHttpClient.Builder();
     private static OkHttpClient okHttpClient;
@@ -28,13 +30,17 @@ public class ServiceGenerator {
     private static Retrofit retrofit = builder.build();
 
     public static <S> S createService(Class<S> serviceClass) {
-        return createService(serviceClass, false, API_BASE_URL_HML);
+        return createService(serviceClass, false, API_BASE_URL_PRD);
+    }
+
+    public static <S> S createService(Class<S> serviceClass, String instanceURL) {
+        return createService(serviceClass, false, instanceURL);
     }
 
     public static <S> S createService(Class<S> serviceClass, boolean auth, String url) {
 
         builder = new Retrofit.Builder()
-                .baseUrl(API_BASE_URL_HML)
+                .baseUrl(url)
                 .addConverterFactory(GsonConverterFactory.create());
 
         AuthenticationInterceptor interceptor = new AuthenticationInterceptor(auth);

@@ -72,6 +72,7 @@ import java.util.Map;
 
 import org.tensorflow.lite.Interpreter;
 
+
 public class SelfieActivity extends Camera2Base implements ImageProcessor, CaptureImageProcessor {
 
     public static final float COMPENSATION_EYE = 0.05f;

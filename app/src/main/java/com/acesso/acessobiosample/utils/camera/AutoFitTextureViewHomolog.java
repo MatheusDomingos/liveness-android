@@ -7,20 +7,20 @@ import android.view.TextureView;
 /**
  * A {@link TextureView} that can be adjusted to a specified aspect ratio.
  */
-public class AutoFitTextureView extends TextureView {
+public class AutoFitTextureViewHomolog extends TextureView {
 
     private int mRatioWidth = 0;
     private int mRatioHeight = 0;
 
-    public AutoFitTextureView(Context context) {
+    public AutoFitTextureViewHomolog(Context context) {
         this(context, null);
     }
 
-    public AutoFitTextureView(Context context, AttributeSet attrs) {
+    public AutoFitTextureViewHomolog(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public AutoFitTextureView(Context context, AttributeSet attrs, int defStyle) {
+    public AutoFitTextureViewHomolog(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }
 

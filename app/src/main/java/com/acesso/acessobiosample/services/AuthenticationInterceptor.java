@@ -13,7 +13,7 @@ public class AuthenticationInterceptor implements Interceptor {
 
     private static boolean auth = false;
 
-    private static final String API_KEY = "f968978f-1417-4d11-8dc4-59477deb3d36";
+    private static final String API_KEY = "7e426bc2-652e-4bce-b6a1-7922fa44ebc9";
 
     public AuthenticationInterceptor(boolean auth) {
         this.auth = auth;
@@ -27,12 +27,12 @@ public class AuthenticationInterceptor implements Interceptor {
         Request.Builder builder = original.newBuilder();
 
         if (auth) {
-            builder.addHeader("X-AcessoBio-APIKEY", API_KEY);
-            builder.addHeader("X-Login", Hawk.get(SharedKey.NAME));
-            builder.addHeader("X-Password",Hawk.get(SharedKey.PASSWORD));
+            builder.addHeader("APIKEY", API_KEY);
+            builder.addHeader("Login", Hawk.get(SharedKey.NAME));
+            builder.addHeader("Password",Hawk.get(SharedKey.PASSWORD));
         } else {
-            builder.addHeader("X-AcessoBio-APIKEY", API_KEY);
-            builder.addHeader("Authentication", Hawk.get(SharedKey.AUTH_TOKEN, ""));
+            builder.addHeader("APIKEY", API_KEY);
+            builder.addHeader("Authorization", Hawk.get(SharedKey.AUTH_TOKEN, ""));
         }
 
         Request request = builder.build();

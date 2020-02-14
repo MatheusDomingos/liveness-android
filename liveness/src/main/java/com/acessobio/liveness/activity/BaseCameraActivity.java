@@ -130,7 +130,6 @@ public class BaseCameraActivity extends AppCompatActivity {
         alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK", (dialog, which) -> dialog.dismiss());
         alertDialog.show();
     }
-
     protected void showAlert(boolean succes, String message, SweetAlertDialog.OnSweetClickListener onClick) {
         new SweetAlertDialog(this, succes ? SweetAlertDialog.SUCCESS_TYPE : SweetAlertDialog.ERROR_TYPE)
                 .setTitleText("AcessoBio")

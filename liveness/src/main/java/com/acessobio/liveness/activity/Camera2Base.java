@@ -60,8 +60,8 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 
-
 public class Camera2Base extends BaseCameraActivity implements View.OnClickListener {
+
 
     protected Boolean DEBUG = Boolean.FALSE;
     protected static Activity activity;

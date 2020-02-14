@@ -1,11 +1,11 @@
-package com.acessobio.liveness.support;
+package com.acesso.acessobiosample.support;
 
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-public class BioLivenessValidate {
+public class BioLivenessValidateHomolog {
 
     private Map<String, Float> dictClose;
     private Map<String, Float> dictAfar;
@@ -24,7 +24,7 @@ public class BioLivenessValidate {
 
     long elapsedSeconds;
 
-    public BioLivenessValidate(Map<String, Float> mConfidenceClose, Map<String, Float> mConfidenceAfar, boolean pUserIsSmilling, boolean pUserIsBlinking, Date pDateStartProcess) {
+    public BioLivenessValidateHomolog(Map<String, Float> mConfidenceClose, Map<String, Float> mConfidenceAfar, boolean pUserIsSmilling, boolean pUserIsBlinking, Date pDateStartProcess) {
         this.dictClose = mConfidenceClose;
         this.dictAfar = mConfidenceAfar;
         this.userIsSmilling = pUserIsSmilling;

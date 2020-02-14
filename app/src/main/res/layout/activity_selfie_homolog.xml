@@ -4,14 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activity.SelfieActivity"
+    tools:context=".activity.homolog.SelfieActivityHomolog"
     android:id="@+id/root_view"
     android:background="@color/colorBlack"
     android:padding="0dp"
     android:layout_margin="0dp">
 
-    <com.acessobio.liveness.utils.camera.AutoFitTextureView
-        android:id="@+id/textureLive"
+    <com.acesso.acessobiosample.utils.camera.AutoFitTextureViewHomolog
+        android:id="@+id/texture"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_centerHorizontal="true"
@@ -39,6 +39,38 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/rectangle"/>
+
+
+    <View
+        android:id="@+id/lineBottom"
+        android:layout_width="match_parent"
+        android:layout_height="0px"
+        android:layout_alignBottom="@+id/texture"
+        android:background="@color/colorOrange" />
+
+    <View
+        android:id="@+id/lineTop"
+        android:layout_width="match_parent"
+        android:layout_height="0px"
+        android:layout_alignTop="@+id/texture"
+        android:background="@color/colorOrange" />
+
+    <View
+        android:id="@+id/lineLeft"
+        android:layout_width="0px"
+        android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="0dp"
+        android:background="@color/colorGreen" />
+
+    <View
+        android:id="@+id/lineRight"
+        android:layout_width="0px"
+        android:layout_height="match_parent"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="0dp"
+        android:background="@android:color/holo_red_dark"
+        android:gravity="right" />
 
 
 </RelativeLayout>

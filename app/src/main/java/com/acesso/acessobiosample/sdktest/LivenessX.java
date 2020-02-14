@@ -8,8 +8,6 @@ import android.content.pm.PackageManager;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
-import com.acesso.acessobiosample.activity.SelfieActivity;
-
 public class LivenessX {
 
     iLivenessX iLivenessX;
@@ -38,8 +36,8 @@ public class LivenessX {
 
     public void openLivenessX(Boolean instructions) {
         if(hasPermission()) {
-            Intent intent = new Intent(this.activity, SelfieActivity.class);
-            activity.startActivityForResult(intent, REQUEST_LIVENESS);
+//            Intent intent = new Intent(this.activity, SelfieActivity.class);
+//            activity.startActivityForResult(intent, REQUEST_LIVENESS);
         }else{
             this.iLivenessX.onError("Permissões de câmera não concedidas. É necessário a implementação para prosseguir.");
         }

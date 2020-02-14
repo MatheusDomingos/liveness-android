@@ -17,21 +17,26 @@ import android.widget.LinearLayout;
 import androidx.annotation.Nullable;
 
 import com.acesso.acessobiosample.R;
-import com.acesso.acessobiosample.activity.SelfieActivity;
 
 
-import com.acessobio.liveness.LivenessX;
-import com.acessobio.liveness.iLivenessX;
+import com.acesso.acessobiosample.activity.SimpleViewActivity;
+import com.acesso.acessobiosample.activity.homolog.SelfieActivityHomolog;
 
+
+import com.acesso.acessobiosample.services.AuthenticationInterceptor;
+import com.acesso.acessobiosample.services.BioService;
+import com.acesso.acessobiosample.services.ServiceGenerator;
+import com.acesso.acessobiosample.support.LivenessXHomolog;
+import com.acesso.acessobiosample.support.iLivenessXHomolog;
+import com.acesso.acessobiosample.utils.enumetators.SharedKey;
 import com.orhanobut.hawk.Hawk;
 
 import java.util.HashMap;
 import java.util.Objects;
 
 
-public class IntroFragment extends CustomFragment implements iLivenessX {
+public class IntroFragment extends CustomFragment implements iLivenessXHomolog {
 
-    ;
 
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_intro, null);
@@ -54,8 +59,12 @@ public class IntroFragment extends CustomFragment implements iLivenessX {
             @Override
             public void onClick(View v) {
 
-                LivenessX livenessX = new LivenessX(IntroFragment.this);
+                LivenessXHomolog livenessX = new LivenessXHomolog(IntroFragment.this, ServiceGenerator.API_BASE_URL_PRD, "f968978f-1417-4d11-8dc4-59477deb3d36" , Hawk.get(SharedKey.AUTH_TOKEN));
                 livenessX.openLivenessX(false);
+
+//                Intent intent = new Intent(getActivity(), SelfieActivityHomolog.class);
+//                intent.putExtra(CustomFragment.FRAGMENT, SelfieActivityHomolog.class);
+//                startActivity(intent);
 
             }
         });
@@ -104,10 +113,10 @@ public class IntroFragment extends CustomFragment implements iLivenessX {
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if(requestCode == LivenessX.REQUEST_LIVENESS) {
+        if(requestCode == LivenessXHomolog.REQUEST_LIVENESS) {
             if (resultCode == Activity.RESULT_OK) {
                 assert data != null;
-                HashMap<String, String> result = data.getParcelableExtra(LivenessX.RESULT_OK);
+                HashMap<String, String> result = data.getParcelableExtra(LivenessXHomolog.RESULT_OK);
                 // TODO Update your TextView.
             }
         }

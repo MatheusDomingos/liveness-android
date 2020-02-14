@@ -11,6 +11,8 @@ import com.acesso.acessobiosample.dto.GetAuthTokenResponse;
 import com.acesso.acessobiosample.dto.GetProcessByUserResponse;
 import com.acesso.acessobiosample.dto.GetProcessResponse;
 import com.acesso.acessobiosample.dto.GetSubjectResponse;
+import com.acesso.acessobiosample.dto.LivenessBillingRequest;
+import com.acesso.acessobiosample.dto.LivenessBillingResponse;
 import com.acesso.acessobiosample.dto.LivenessRequest;
 import com.acesso.acessobiosample.dto.LivenessResponse;
 
@@ -26,7 +28,7 @@ public interface BioService {
     @GET("subject/{cpf}")
     Call<GetSubjectResponse> getSubject(@Path("cpf") String cpf);
 
-    @GET("user/authToken")
+    @GET("token")
     Call<GetAuthTokenResponse> getAuthToken();
 
     @GET("process/{user}/list")
@@ -58,6 +60,10 @@ public interface BioService {
     @Headers({"Content-Type: application/json;charset=UTF-8"})
     Call<LivenessResponse> liveness(@Path("process") String process,
                                       @Body LivenessRequest request);
+
+    @POST("liveness/billing")
+    @Headers({"Content-Type: application/json;charset=UTF-8"})
+    Call<LivenessBillingResponse> livenessBilling(@Body LivenessBillingRequest request);
 
 
 

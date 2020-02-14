@@ -7,18 +7,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 
 import androidx.annotation.Nullable;
 
 import com.acesso.acessobiosample.R;
-import com.acesso.acessobiosample.activity.SelfieActivity;
 import com.orhanobut.hawk.Hawk;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 public class ResultFragment extends CustomFragment {
 

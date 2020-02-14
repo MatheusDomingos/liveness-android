@@ -16,6 +16,7 @@ import com.acesso.acessobiosample.activity.FormViewActivity;
 
 import com.acesso.acessobiosample.activity.SimpleViewActivity;
 import com.acesso.acessobiosample.dto.GetAuthTokenResponse;
+import com.acesso.acessobiosample.dto.GetProcessByUserResponse;
 import com.acesso.acessobiosample.services.BioService;
 import com.acesso.acessobiosample.services.ServiceGenerator;
 import com.acesso.acessobiosample.utils.enumetators.SharedKey;
@@ -28,9 +29,14 @@ import retrofit2.Response;
 public class WelcomeFragment extends CustomFragment{
 
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_welcome, null);
 
         Hawk.init(getActivity()).build();
+
+        View v = inflater.inflate(R.layout.fragment_welcome, null);
+
+        Hawk.put(SharedKey.NAME, "ADMIN");
+        Hawk.put(SharedKey.PASSWORD, "Ac3ss0#66");
+
 
         Button btStart = ((Button) v.findViewById(R.id.btStart));
         btStart.setOnClickListener(new View.OnClickListener() {
@@ -41,7 +47,6 @@ public class WelcomeFragment extends CustomFragment{
                 intent.putExtra(CustomFragment.FRAGMENT, IntroFragment.class);
                 startActivity(intent);
                 getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-
 
             }
         });

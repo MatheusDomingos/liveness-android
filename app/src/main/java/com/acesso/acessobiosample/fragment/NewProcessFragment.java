@@ -20,7 +20,6 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.acesso.acessobiosample.R;
-import com.acesso.acessobiosample.activity.SelfieActivity;
 import com.acesso.acessobiosample.dto.CreateProcessRequest;
 import com.acesso.acessobiosample.dto.CreateProcessResponse;
 import com.acesso.acessobiosample.dto.Subject;
@@ -122,8 +121,8 @@ public class NewProcessFragment extends CustomFragment {
                                         String processId = body.getCreateProcessResult().getProcess().getId();
                                         Hawk.put(SharedKey.PROCESS, processId);
 
-                                        Intent intent = new Intent(getActivity(), SelfieActivity.class);
-                                        startActivity(intent);
+//                                        Intent intent = new Intent(getActivity(), SelfieActivity.class);
+//                                        startActivity(intent);
 
                                     } else {
 
