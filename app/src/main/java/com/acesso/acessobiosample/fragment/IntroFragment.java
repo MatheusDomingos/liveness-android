@@ -1,9 +1,13 @@
 package com.acesso.acessobiosample.fragment;
 
 import android.app.Activity;
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+
+import android.content.pm.PackageManager;
+import android.media.Image;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,7 +18,10 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.acesso.acessobiosample.R;
 
@@ -38,6 +45,8 @@ import java.util.Objects;
 public class IntroFragment extends CustomFragment implements iLivenessXHomolog {
 
 
+    protected static final int REQUEST_CAMERA_PERMISSION = 1;
+
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_intro, null);
 
@@ -59,18 +68,43 @@ public class IntroFragment extends CustomFragment implements iLivenessXHomolog {
             @Override
             public void onClick(View v) {
 
-                LivenessXHomolog livenessX = new LivenessXHomolog(IntroFragment.this, ServiceGenerator.API_BASE_URL_PRD, "f968978f-1417-4d11-8dc4-59477deb3d36" , Hawk.get(SharedKey.AUTH_TOKEN));
-                livenessX.openLivenessX(false);
+                if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
+                {
 
-//                Intent intent = new Intent(getActivity(), SelfieActivityHomolog.class);
-//                intent.putExtra(CustomFragment.FRAGMENT, SelfieActivityHomolog.class);
-//                startActivity(intent);
+                    requestPermissions(new String[] {
+                            Manifest.permission.CAMERA
+                    }, REQUEST_CAMERA_PERMISSION);
+
+                }
+                else {
+                    LivenessXHomolog livenessX = new LivenessXHomolog(IntroFragment.this, ServiceGenerator.API_BASE_URL_PRD, "f968978f-1417-4d11-8dc4-59477deb3d36" , Hawk.get(SharedKey.AUTH_TOKEN));
+                    livenessX.openLivenessX(false);
+                }
 
             }
         });
 
         return v;
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+
+        switch (requestCode) {
+            case REQUEST_CAMERA_PERMISSION: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+                    Intent intent = new Intent(getActivity(), SelfieActivityHomolog.class);
+                    startActivity(intent);
+                }
+                break;
+            }
+        }
+
+    }
+
 
     private void exibirMensagemEdt(String titulo, String texto){
 
@@ -109,6 +143,7 @@ public class IntroFragment extends CustomFragment implements iLivenessXHomolog {
         Log.d("IntroFragment", error);
     }
 
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -117,6 +152,7 @@ public class IntroFragment extends CustomFragment implements iLivenessXHomolog {
             if (resultCode == Activity.RESULT_OK) {
                 assert data != null;
                 HashMap<String, String> result = data.getParcelableExtra(LivenessXHomolog.RESULT_OK);
+                Log.d(TAG, result.get("result"));
                 // TODO Update your TextView.
             }
         }

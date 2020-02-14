@@ -1,65 +1,120 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    >
 
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginTop="100dp"
-        >
+        android:layout_marginTop="80dp"
+        android:orientation="vertical">
 
         <ImageView
             android:layout_width="90dp"
             android:layout_height="90dp"
-            android:src="@drawable/ic_liveness_success"
-            android:adjustViewBounds="true"
             android:layout_gravity="center_horizontal"
+            android:adjustViewBounds="true"
             android:scaleType="fitCenter"
-            />
+            android:src="@drawable/ic_liveness_success" />
 
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAlignment="center"
-                android:textColor="@color/colorIntroTitle"
-                android:text="@string/label_liveness_success"
-                android:textStyle="normal"
-                android:layout_marginTop="30dp"
-                android:layout_gravity="center_horizontal"
-                android:textSize="20sp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="30dp"
+            android:text="@string/label_liveness_success"
+            android:textAlignment="center"
+            android:textColor="@color/colorIntroTitle"
+            android:textSize="20sp"
+            android:textStyle="normal" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:layout_marginTop="40dp"
             android:gravity="center_horizontal"
-            android:layout_marginTop="60dp">
+            android:orientation="horizontal">
 
-            <ImageView
-                android:id="@+id/ivClose"
-                android:adjustViewBounds="true"
-                android:scaleType="centerCrop"
-                android:layout_width="100dp"
-                android:layout_height="140dp"
-                android:layout_marginEnd="10dp"/>
 
+            <androidx.cardview.widget.CardView
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:layout_width="124dp"
+                android:layout_height="164dp"
+                android:layout_marginStart="10dp"
+                app:cardCornerRadius="6dp"
+                app:cardUseCompatPadding="true"
+                app:cardPreventCornerOverlap="true"
+                app:cardBackgroundColor="#fff"
+                app:contentPaddingTop="-3dp"
+                app:contentPaddingLeft="-2dp"
+                >
+
+            <androidx.cardview.widget.CardView
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:layout_width="120dp"
+                android:layout_height="160dp"
+                app:cardCornerRadius="6dp"
+                app:cardUseCompatPadding="true"
+                app:cardPreventCornerOverlap="true"
+                app:cardElevation="0dp"
+                app:contentPadding="0dp"
+                >
+
+                <ImageView
+                    android:id="@+id/ivClose"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:cropToPadding="true"
+                    android:scaleType="centerCrop"
+                    android:layout_gravity="center"
+                     />
+
+            </androidx.cardview.widget.CardView>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:layout_width="124dp"
+                android:layout_height="164dp"
+                android:layout_marginStart="10dp"
+                app:cardCornerRadius="6dp"
+                app:cardUseCompatPadding="true"
+                app:cardPreventCornerOverlap="true"
+                app:cardBackgroundColor="#fff"
+                app:contentPaddingTop="-3dp"
+                app:contentPaddingLeft="-2dp"
+                >
+            <androidx.cardview.widget.CardView
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:layout_width="120dp"
+                android:layout_height="160dp"
+                app:cardCornerRadius="6dp"
+                app:cardUseCompatPadding="true"
+                app:cardPreventCornerOverlap="true"
+                app:cardElevation="0dp"
+                app:contentPadding="0dp"
+                >
             <ImageView
                 android:id="@+id/ivAfar"
-                android:adjustViewBounds="true"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:cropToPadding="true"
                 android:scaleType="centerCrop"
-                android:layout_width="100dp"
-                android:layout_height="140dp"
-                android:layout_marginStart="10dp"/>
+                android:layout_gravity="center"/>
+            </androidx.cardview.widget.CardView>
+            </androidx.cardview.widget.CardView>
+
+        </LinearLayout>
+
 
     </LinearLayout>
-
-
-    </LinearLayout>
-
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -70,26 +125,26 @@
         <Button
             android:id="@+id/btFeedback"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:background="@drawable/button_corners_border"
+            android:layout_height="50dp"
+            android:background="@drawable/button_background_rounded"
             android:text="@string/label_give_feedback"
             android:textAllCaps="false"
-            android:textColor="@color/colorPrimary"
-            android:layout_marginStart="30dp"
-            android:layout_marginEnd="30dp"
+            android:textColor="@color/colorWhite"
+            android:layout_marginStart="40dp"
+            android:layout_marginEnd="40dp"
             android:layout_marginBottom="20dp"
             android:textSize="16sp"
             />
         <Button
             android:id="@+id/btExit"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:background="@drawable/button_background_rounded"
+            android:layout_height="50dp"
+            android:background="@drawable/button_corners_border"
             android:text="@string/label_exit"
             android:textAllCaps="false"
-            android:textColor="@color/colorWhite"
-            android:layout_marginStart="30dp"
-            android:layout_marginEnd="30dp"
+            android:textColor="@color/colorPrimary"
+            android:layout_marginStart="40dp"
+            android:layout_marginEnd="40dp"
             android:layout_marginBottom="40dp"
             android:textSize="16sp"
             />

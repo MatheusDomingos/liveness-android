@@ -262,8 +262,6 @@ public class SelfieActivityHomolog extends Camera2BaseHomolog implements ImagePr
             this.authToken = b.getString("authToken");
         }
 
-
-
         currentColorBorder = Color.WHITE;
 
         if (DEBUG) Log.d(TAG, "from activity: " + origin);
@@ -1113,6 +1111,11 @@ public class SelfieActivityHomolog extends Camera2BaseHomolog implements ImagePr
                         sendRequestLiveness(resultLiveness);
 
                         Boolean IsLiveness = "1".equals(resultLiveness.get("isLiveness"));
+
+
+
+                        Bitmap bitClose = Bitmap.createScaledBitmap(bitmapClose, 200, 280, false);
+                        Bitmap bitAfar = Bitmap.createScaledBitmap(bitmapAfarSmiling, 200, 280, false);
 
                         HashMap<String, String> callBackResult = new HashMap<>();
                         callBackResult.put("isLiveness", resultLiveness.get("isLiveness"));

@@ -19,7 +19,7 @@
     <!-- fragment Welcome -->
     <string name="label_welcome">Seja bem vindo</string>
     <string name="label_welcome_description">Esse é o aplicativo de testes de Biometria Facial Liveness da Acesso Digital</string>
-    <string name="label_button_start">Iniciar teste</string>
+    <string name="label_button_start">Iniciar</string>
 
     <!-- fragment Welcome -->
     <string name="label_button_take">Tirar foto</string>
