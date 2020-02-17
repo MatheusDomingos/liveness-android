@@ -152,20 +152,24 @@ public class BioLivenessValidateHomolog {
         float confidencePhotoLive = dictClose.get("confidencePhotoLive");
         float confidencePhotoOfPhoto = dictClose.get("confidencePhotoOfPhoto");
 
-        if(confidencePhotoLive >= 0.8 && confidencePhotoOfPhoto <= 0.5) {
+        if(confidencePhotoLive >= 0.9) {
             return true;
-        }else return confidencePhotoLive >= confidencePhotoOfPhoto;
+        }else{
+            return false;
+        }
 
     }
 
     private boolean isPhotoAwayLive () {
 
-        float confidencePhotoLive = dictClose.get("confidencePhotoLive");
-        float confidencePhotoOfPhoto = dictClose.get("confidencePhotoOfPhoto");
+        float confidencePhotoLive = dictAfar.get("confidencePhotoLive");
+        float confidencePhotoOfPhoto = dictAfar.get("confidencePhotoOfPhoto");
 
-        if(confidencePhotoLive >= 0.8 && confidencePhotoOfPhoto <= 0.5) {
+        if(confidencePhotoLive >= 0.9) {
             return true;
-        }else return confidencePhotoLive >= confidencePhotoOfPhoto;
+        }else{
+            return false;
+        }
 
     }
 

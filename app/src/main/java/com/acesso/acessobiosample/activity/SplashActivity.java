@@ -66,8 +66,6 @@ public class SplashActivity extends AppCompatActivity {
         }, SPLASH_DISPLAY_LENGTH);
 
 
-
-
     }
 
     private void getAuthToken(){
@@ -96,14 +94,17 @@ public class SplashActivity extends AppCompatActivity {
                             intent.putExtra(CustomFragment.FRAGMENT, WelcomeFragment.class);
                             startActivity(intent);
                             overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+
                         }
                         else {
+                            getAuthToken();
                             Log.d("SplashActivity",body != null ? body.getMessageError() : "Erro ao recuperar token");
                         }
                     }
 
                     @Override
                     public void onFailure(Call<GetAuthTokenResponse> call, Throwable t) {
+                        getAuthToken();
                         Log.d("SplashActivity",t.getMessage());
                     }
                 });
@@ -130,12 +131,14 @@ public class SplashActivity extends AppCompatActivity {
                             Hawk.put(SharedKey.AUTH_TOKEN_PANTHER, body.getToken());
                         }
                         else {
+                            getAuthTokenBlackPanther();
                             Log.d("SplashActivity",body != null ? body.getMessageError() : "Erro ao recuperar token");
                         }
                     }
 
                     @Override
                     public void onFailure(Call<GetAuthTokenResponse> call, Throwable t) {
+                        getAuthTokenBlackPanther();
                         Log.d("SplashActivity",t.getMessage());
                     }
                 });

@@ -885,7 +885,7 @@ public class SelfieActivityHomolog extends Camera2BaseHomolog implements ImagePr
         Arrays.sort(floatBlink, 0, floatBlink.length);
 
         if(floatBlink[floatBlink.length - 1] > 0.8f &&
-                floatBlink[0] < 0.5f && floatBlink[1] < 0.5f){
+                floatBlink[0] < 0.5f && floatBlink[1] < 0.5f && floatBlink[2] < 0.5f){
             return true;
         }else{
             return false;
