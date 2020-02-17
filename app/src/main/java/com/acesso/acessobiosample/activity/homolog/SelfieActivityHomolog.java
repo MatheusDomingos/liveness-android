@@ -239,6 +239,7 @@ public class SelfieActivityHomolog extends Camera2BaseHomolog implements ImagePr
     //User behaviors
     float smilingProbability = 0f;
     boolean isSmilingApproved = false;
+    boolean isUserBlinkingAprroved = false;
     float leftEyeOpenProbability = 0f;
     float rightEyeOpenProbability = 0f;
     boolean isEnterSmiling = false; // Did the user come in with a smile on his face?
@@ -1097,7 +1098,6 @@ public class SelfieActivityHomolog extends Camera2BaseHomolog implements ImagePr
 
 
     private void flowSmile() {
-        userIsBlinking();
 
         isEnterSmiling = userIsSmilling();
 
@@ -1141,7 +1141,9 @@ public class SelfieActivityHomolog extends Camera2BaseHomolog implements ImagePr
                         Map<String, Float> mConfidenceClose = tfBioReader.processImage(bitmapClose);
                         Map<String, Float> mConfidenceAfar = tfBioReader.processImage(bitmapAfarSmiling);
 
-                        BioLivenessValidateHomolog bioLivenessValidate = new BioLivenessValidateHomolog(mConfidenceClose, mConfidenceAfar, isSmilingApproved, userIsBlinking(), startDateOfProcess);
+                        isUserBlinkingAprroved =   userIsBlinking();
+
+                        BioLivenessValidateHomolog bioLivenessValidate = new BioLivenessValidateHomolog(mConfidenceClose, mConfidenceAfar, isSmilingApproved, isUserBlinkingAprroved, startDateOfProcess);
                         resultLiveness = bioLivenessValidate.getLivenessResultDescription();
 
                         if(resultLiveness.get("isLiveness").equals("0")) {
@@ -1328,7 +1330,7 @@ public class SelfieActivityHomolog extends Camera2BaseHomolog implements ImagePr
         Float ScoreClose = Float.valueOf(resultLiveness.get("ScoreClose"));
         Float ScoreAway = Float.valueOf(resultLiveness.get("ScoreAway"));
         Integer Time = Integer.valueOf(resultLiveness.get("Time"));
-        Boolean IsBlinking = userIsBlinking();
+        Boolean IsBlinking = isUserBlinkingAprroved;
 
         String username = Hawk.get(SharedKey.USER_NAME);
         String document = Hawk.get(SharedKey.USER_DOCUMENT);
