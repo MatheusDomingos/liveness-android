@@ -2,6 +2,7 @@ package com.acesso.acessobiosample.activity.homolog;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.PersistableBundle;
@@ -119,6 +120,23 @@ public class BaseCameraActivityHomolog extends  AppCompatActivity {
                 return null;
             }
         }
+
+    protected Integer getResponseCode(Response response) {
+        try {
+            JSONObject j = new JSONObject(response.errorBody().string());
+            JSONObject error = j.getJSONObject("Error");
+            Integer code = error.getInt("Code");
+
+            return code;
+
+        } catch (JSONException ex) {
+            Log.d(TAG, ex.toString());
+            return null;
+        } catch (IOException ex) {
+            Log.d(TAG, ex.toString());
+            return null;
+        }
+    }
 
         public boolean isEmptyAuthToken() {
             String authToken = Hawk.get(SharedKey.AUTH_TOKEN, "");

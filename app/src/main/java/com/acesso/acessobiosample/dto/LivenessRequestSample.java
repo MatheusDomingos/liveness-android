@@ -7,10 +7,9 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class LivenessResult {
+public class LivenessRequestSample {
 
-    @SerializedName("Error")
-    private Error error;
-    @SerializedName("Status")
-    private int status;
+    @SerializedName("liveness")
+    private LivenessRequest liveness;
+
 }

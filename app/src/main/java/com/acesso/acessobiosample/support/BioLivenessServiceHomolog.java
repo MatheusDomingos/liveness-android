@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.util.Log;
 
 import com.acesso.acessobiosample.dto.LivenessRequest;
+import com.acesso.acessobiosample.dto.LivenessRequestSample;
 import com.acesso.acessobiosample.dto.LivenessResponse;
 import com.acesso.acessobiosample.services.BioService;
 import com.acesso.acessobiosample.services.ServiceGenerator;
@@ -21,13 +22,13 @@ public class BioLivenessServiceHomolog {
 
     protected static final String TAG = "BioLivenessServiceHomolog.java";
 
-    public void sendLiveness (LivenessRequest livenessRequest) {
+    public void sendLiveness (LivenessRequestSample livenessRequestSample) {
 
         // /app/liveness  ----------------------
 
         ServiceGenerator
                 .createService(BioService.class)
-                .liveness("9ACD012B-BFBD-413E-9B4D-C626D0C6086F", livenessRequest)
+                .liveness("9ACD012B-BFBD-413E-9B4D-C626D0C6086F", livenessRequestSample)
                 .enqueue(new Callback<LivenessResponse>() {
 
                     @Override

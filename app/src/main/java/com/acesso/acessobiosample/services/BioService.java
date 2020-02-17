@@ -14,6 +14,7 @@ import com.acesso.acessobiosample.dto.GetSubjectResponse;
 import com.acesso.acessobiosample.dto.LivenessBillingRequest;
 import com.acesso.acessobiosample.dto.LivenessBillingResponse;
 import com.acesso.acessobiosample.dto.LivenessRequest;
+import com.acesso.acessobiosample.dto.LivenessRequestSample;
 import com.acesso.acessobiosample.dto.LivenessResponse;
 
 import retrofit2.Call;
@@ -59,7 +60,7 @@ public interface BioService {
     @POST("app/liveness/{process}")
     @Headers({"Content-Type: application/json;charset=UTF-8"})
     Call<LivenessResponse> liveness(@Path("process") String process,
-                                      @Body LivenessRequest request);
+                                      @Body LivenessRequestSample request);
 
     @POST("liveness/billing")
     @Headers({"Content-Type: application/json;charset=UTF-8"})

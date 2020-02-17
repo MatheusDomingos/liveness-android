@@ -171,7 +171,6 @@ public class NewProcessFragment extends CustomFragment {
 
     }
 
-
     public boolean validateForm() {
         boolean valid = true;
         View focusView = null;
@@ -217,7 +216,6 @@ public class NewProcessFragment extends CustomFragment {
     private boolean isCpfValid(String cpf) {
         return Validators.CPF.isValid(cpf);
     }
-
 
 
     @Override

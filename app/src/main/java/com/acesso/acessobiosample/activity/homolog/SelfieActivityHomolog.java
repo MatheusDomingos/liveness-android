@@ -15,6 +15,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.text.TextUtils;
 import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -35,12 +36,18 @@ import androidx.annotation.RequiresApi;
 import androidx.core.content.res.ResourcesCompat;
 
 import com.acesso.acessobiosample.R;
+import com.acesso.acessobiosample.dto.CreateProcessRequest;
+import com.acesso.acessobiosample.dto.CreateProcessResponse;
 import com.acesso.acessobiosample.dto.ExecuteProcessResponse;
 import com.acesso.acessobiosample.dto.FaceInsertRequest;
 import com.acesso.acessobiosample.dto.FaceInsertResponse;
 import com.acesso.acessobiosample.dto.GetProcessResponse;
 import com.acesso.acessobiosample.dto.LivenessBillingRequest;
 import com.acesso.acessobiosample.dto.LivenessBillingResponse;
+import com.acesso.acessobiosample.dto.LivenessRequest;
+import com.acesso.acessobiosample.dto.LivenessRequestSample;
+import com.acesso.acessobiosample.dto.LivenessResponse;
+import com.acesso.acessobiosample.dto.Subject;
 import com.acesso.acessobiosample.services.BioService;
 import com.acesso.acessobiosample.services.ServiceGenerator;
 import com.acesso.acessobiosample.support.BioLivenessServiceHomolog;
@@ -65,6 +72,7 @@ import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions;
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceLandmark;
 import com.orhanobut.hawk.Hawk;
 
+import org.json.JSONObject;
 import org.tensorflow.lite.Interpreter;
 
 import java.io.ByteArrayOutputStream;
@@ -237,7 +245,6 @@ public class SelfieActivityHomolog extends Camera2BaseHomolog implements ImagePr
     List<Float> arrLeftEyeOpenProbability = new ArrayList<Float>();
     Date startDateOfProcess; // This variable indicates the hour/minute/second of the begin process.
 
-
     // Process Session
     // Through  this variable, we have been control the session of user.
     private int SESSION = 0;
@@ -247,6 +254,19 @@ public class SelfieActivityHomolog extends Camera2BaseHomolog implements ImagePr
 
     // Billing
     private String urlInstance, apikey, authToken;
+
+    // Requests
+    String biometryMessageClose = "";
+    Integer biometryCodeClose = 200;
+
+    String biometryMessageAfar = "";
+    Integer biometryCodeAfar = 200;
+
+    HashMap<String, String> resultLiveness;
+
+    int spoofingReset = 0;
+
+    boolean isCommingVerificationFromSpoofing = false;
 
     @SuppressLint("ResourceAsColor")
     @Override
@@ -334,7 +354,12 @@ public class SelfieActivityHomolog extends Camera2BaseHomolog implements ImagePr
         SESSION++;
 
         currentFlow = Flow.CLOSE;
-        if(!verifySession()) return;
+
+        if(isCommingVerificationFromSpoofing) {
+           isCommingVerificationFromSpoofing = false;
+        }else{
+            if(!verifySession()) return;
+        }
 
         isSmilingApproved = false;
         bitmapClose = null;
@@ -348,6 +373,9 @@ public class SelfieActivityHomolog extends Camera2BaseHomolog implements ImagePr
     private boolean verifySession () {
         if(SESSION == 3) {
             currentFlow = Flow.SMILE_VALIDATE_ERROR;
+            if(isCommingVerificationFromSpoofing) {
+                return  false;
+            }
             createTimer(); // Do request
             return false;
         }
@@ -1028,7 +1056,9 @@ public class SelfieActivityHomolog extends Camera2BaseHomolog implements ImagePr
 
         // This condition verify wether the flow is close and different of smile error. Then the startTime is initialized.
         if(currentFlow == Flow.CLOSE) {
-            startDateOfProcess = Calendar.getInstance().getTime();
+            if(startDateOfProcess == null) {
+                startDateOfProcess = Calendar.getInstance().getTime();
+            }
         }
 
         minDiffEye = 160f;
@@ -1095,9 +1125,14 @@ public class SelfieActivityHomolog extends Camera2BaseHomolog implements ImagePr
                 public void run() {
 
                     if(currentFlow == Flow.CLOSE) {
+
                         bitmapClose = bitmap;
                         base64Close = base64;
+                        changeTheFlow();
+
                     }else if(currentFlow == Flow.SMILE || currentFlow == Flow.SMILE_VALIDATE_ERROR) {
+
+                        destroyTimerUserBehavior();
 
                         bitmapAfarSmiling = bitmap;
                         base64Afar = base64;
@@ -1107,12 +1142,29 @@ public class SelfieActivityHomolog extends Camera2BaseHomolog implements ImagePr
                         Map<String, Float> mConfidenceAfar = tfBioReader.processImage(bitmapAfarSmiling);
 
                         BioLivenessValidateHomolog bioLivenessValidate = new BioLivenessValidateHomolog(mConfidenceClose, mConfidenceAfar, isSmilingApproved, userIsBlinking(), startDateOfProcess);
-                        HashMap<String, String> resultLiveness = bioLivenessValidate.getLivenessResultDescription();
+                        resultLiveness = bioLivenessValidate.getLivenessResultDescription();
 
-                        sendRequestLiveness(resultLiveness);
+                        if(resultLiveness.get("isLiveness").equals("0")) {
+                            if(verifySession()) {
+
+                                spoofingReset ++;
+                                isCommingVerificationFromSpoofing = true;
+                                isRequestImage = false;
+                                destroyTimer();
+                                destroyTimerUserBehavior();
+                                currentFlow = Flow.RESET;
+                                changeTheFlow();
+                                reopenCamera();
+
+                                return;
+                            }
+                        }
+
+                        sendBilling(resultLiveness.get("isLiveness"));
+                        createProcess();
+                        // sendRequestLiveness(resultLiveness);
 
                         Boolean IsLiveness = "1".equals(resultLiveness.get("isLiveness"));
-
 
                         Bitmap bitClose = Bitmap.createScaledBitmap(bitmapClose, 200, 280, false);
                         Bitmap bitAfar = Bitmap.createScaledBitmap(bitmapAfarSmiling, 200, 280, false);
@@ -1133,50 +1185,15 @@ public class SelfieActivityHomolog extends Camera2BaseHomolog implements ImagePr
 
                         Intent resultIntent = new Intent();
                         resultIntent.putExtra(LivenessXHomolog.RESULT_OK, callBackResult);
-                      //  resultIntent.putExtra(LivenessXHomolog.RESULT_OK, "1");
                         SelfieActivityHomolog.this.setResult(Activity.RESULT_OK, resultIntent);
                         finish();
-
-
-                        // result.put("bitmapClose", base64Close);
-                        //result.put("bitmapAfar", base64Afar);
-
-                      /*
-
-
-                        Intent intent = new Intent(SelfieActivity.this, SimpleViewActivity.class);
-                        intent.putExtra(CustomFragment.FRAGMENT, ResultFragment.class);
-
-                        intent.putExtra("isLiveness", IsLiveness);
-                        intent.putExtra("result", resultLiveness);
-                        intent.putExtra("bitmapClose", bitClose);
-                        intent.putExtra("bitmapAfar", bitAfar);
-                        startActivity(intent);
-
-                        */
-
 
                     }
 
                     isRequestImage = false; // Added this line in the liveness branch. Before, this line was just after the faceInset request or in ErrorMethod.
-                    changeTheFlow();
 
                 }
             });
-
-            //* String processId = Hawk.get(SharedKey.PROCESS, "");
-            //* String cpf = Hawk.get(SharedKey.CPF, "");
-
-//            dialog = new SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE);
-//            dialog.getProgressHelper().setBarColor(Color.parseColor("#2980ff"));
-//            dialog.setTitleText("Aguarde...");
-//            dialog.setCancelable(false);
-//            dialog.show();
-
-            // cadastro
-            //* if (processId != null && processId.trim().length() > 0) {
-            //* faceInsert(base64, processId);
-            //*}
 
 
         } else {
@@ -1184,24 +1201,14 @@ public class SelfieActivityHomolog extends Camera2BaseHomolog implements ImagePr
         }
     }
 
-    private void sendRequestLiveness (HashMap<String, String> resultLiveness) {
 
-        Float Score = Float.valueOf(resultLiveness.get("Score"));
-        Boolean IsLiveness =  Boolean.valueOf(resultLiveness.get("isLiveness"));
-        Boolean LivenessClose = Boolean.valueOf(resultLiveness.get("isLiveClose"));
-        Boolean LivenessAway = Boolean.valueOf(resultLiveness.get("isLiveAway"));
-        Float ScoreClose = Float.valueOf(resultLiveness.get("ScoreClose"));
-        Float ScoreAway = Float.valueOf(resultLiveness.get("ScoreAway"));
-        Integer Time = Integer.valueOf(resultLiveness.get("Time"));
-        Boolean IsBlinking = userIsBlinking();
-        Boolean IsSmilling = userIsSmilling();
-
+    private void sendBilling (String isLiveness) {
 
         String suuid = UUID.randomUUID().toString();
 
         LivenessBillingRequest request = new LivenessBillingRequest();
         request.setId(suuid);
-        request.setStatus(resultLiveness.get("isLiveness"));
+        request.setStatus(isLiveness);
 
         // Face Insert  ----------------------
         ServiceGenerator
@@ -1245,31 +1252,174 @@ public class SelfieActivityHomolog extends Camera2BaseHomolog implements ImagePr
                 });
 
 
-
-//        LivenessRequest request = new LivenessRequest();
-//        request.setUserName("Matheus Domingos");
-//        request.setUserCPF("09870360920");
-//        request.setScore(Score);
-//        request.setIsLIve(IsLiveness);
-//        request.setScoreClose(ScoreClose);
-//        request.setIsLiveClose(LivenessClose);
-//        request.setScoreAway(ScoreAway);
-//        request.setIsLiveAway(LivenessAway);
-//        request.setIsBlinking(IsBlinking);
-//        request.setIsSmilling(IsSmilling);
-//        request.setDeviceModel("ANDROID");
-//        request.setBase64Center(base64Close);
-//        request.setBase64Away(base64Afar);
-//        request.setIsResetSession(false);
-//        request.setAttemptsValidate(1);
-//        request.setIsResetSessionSpoofing(false);
-//        request.setAttemptsSpoofing(1);
-//        request.setTimeTotal(Time);
-//
-//        BioLivenessService bioLivenessService = new BioLivenessService();
-//        bioLivenessService.sendLiveness(request);
+    }
 
 
+    private void createProcess () {
+
+        CreateProcessRequest request = new CreateProcessRequest();
+        Subject subject = new Subject();
+        subject.setCode(verifyNullStringRequest(Hawk.get(SharedKey.USER_DOCUMENT)));
+        subject.setName(verifyNullStringRequest(Hawk.get(SharedKey.USER_NAME)));
+        request.setSubject(subject);
+
+        ServiceGenerator
+                .createService(BioService.class, false, true, ServiceGenerator.API_BASE_URL_HML)
+                .createProcess("1", request)
+                .enqueue(new Callback<CreateProcessResponse>() {
+
+                    @Override
+                    public void onResponse(Call<CreateProcessResponse> call, Response<CreateProcessResponse> response) {
+                        CreateProcessResponse body = response.body();
+
+                        if (body != null && body.isValid()) {
+
+                            String processId = body.getCreateProcessResult().getProcess().getId();
+                            faceInsertClose(base64Close, processId);
+
+                        } else {
+
+                            try {
+                                JSONObject j = new JSONObject(response.errorBody().string());
+                                JSONObject error = j.getJSONObject("Error");
+                                String message = error.getString("Description");
+
+                                new SweetAlertDialog(SelfieActivityHomolog.this, SweetAlertDialog.WARNING_TYPE)
+                                        .setTitleText("Ops!")
+                                        .setContentText(message)
+                                        .setConfirmText("Entendi")
+                                        .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                                            @Override
+                                            public void onClick(SweetAlertDialog sDialog) {
+
+                                                sDialog.dismissWithAnimation();
+
+                                            }
+                                        }).show();
+
+                            } catch (Exception ex) {
+
+                             //   if (!showSnackbarError(response.message().toString())) {
+                                    Log.d("SELFIE ACTIVITY HOMOLOG", body != null ? body.getMessageError() : "Erro ao criar registro");
+                              //  }
+
+                                Log.d(TAG, ex.getMessage());
+                            }
+
+
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<CreateProcessResponse> call, Throwable t) {
+                        Log.d(TAG, t.getMessage());
+                        showSnackbarError(t.getMessage());
+                    }
+                });
+
+    }
+
+    private void sendRequestLiveness () {
+
+        Float Score = Float.valueOf(resultLiveness.get("Score"));
+        Boolean IsLiveness = "1".equals(resultLiveness.get("isLiveness"));
+        Boolean LivenessClose = "1".equals(resultLiveness.get("isLiveClose"));
+        Boolean LivenessAway = "1".equals(resultLiveness.get("isLiveAway"));
+        Float ScoreClose = Float.valueOf(resultLiveness.get("ScoreClose"));
+        Float ScoreAway = Float.valueOf(resultLiveness.get("ScoreAway"));
+        Integer Time = Integer.valueOf(resultLiveness.get("Time"));
+        Boolean IsBlinking = userIsBlinking();
+
+        String username = Hawk.get(SharedKey.USER_NAME);
+        String document = Hawk.get(SharedKey.USER_DOCUMENT);
+        String devicemodelname = getDeviceName();
+
+        boolean isResetSession = false;
+        if(SESSION > 0) {
+            isResetSession = true;
+        }
+
+        boolean isSpoofingReset = false;
+        if(spoofingReset > 0) {
+            isSpoofingReset = true;
+        }
+
+        LivenessRequest requestLiveness = new LivenessRequest();
+        requestLiveness.setUserName(verifyNullStringRequest(username));
+        requestLiveness.setUserCPF(verifyNullStringRequest(document));
+        requestLiveness.setScore(Score);
+        requestLiveness.setIsLIve(IsLiveness);
+        requestLiveness.setScoreClose(ScoreClose);
+        requestLiveness.setIsLiveClose(LivenessClose);
+        requestLiveness.setScoreAway(ScoreAway);
+        requestLiveness.setIsLiveAway(LivenessAway);
+        requestLiveness.setIsBlinking(IsBlinking);
+        requestLiveness.setIsSmilling(isSmilingApproved);
+        requestLiveness.setDeviceModel(verifyNullStringRequest(devicemodelname));
+        requestLiveness.setBase64Center(base64Close);
+        requestLiveness.setBase64Away(base64Afar);
+        requestLiveness.setIsResetSession(isResetSession);
+        requestLiveness.setAttemptsValidate(1);
+        requestLiveness.setIsResetSessionSpoofing(isSpoofingReset);
+        requestLiveness.setAttemptsSpoofing(spoofingReset);
+        requestLiveness.setTimeTotal(Time);
+        requestLiveness.setBiometryMessage(biometryMessageClose);
+        requestLiveness.setBiometryStatus(biometryCodeClose);
+        requestLiveness.setBiometryMessageAway(biometryMessageAfar);
+        requestLiveness.setBiometryStatusAway(biometryCodeAfar);
+
+        LivenessRequestSample livenessRequestSample = new LivenessRequestSample();
+        livenessRequestSample.setLiveness(requestLiveness);
+
+        ServiceGenerator
+                .createService(BioService.class, false, true, "https://crediariohomolog.acesso.io/blackpanther/services/v2/credService.svc/")
+                .liveness("24036E73-64A1-498E-8824-67BC99F81AB3", livenessRequestSample)
+                .enqueue(new Callback<LivenessResponse>() {
+
+                    @Override
+                    public void onResponse(Call<LivenessResponse> call, Response<LivenessResponse> response) {
+                        LivenessResponse body = response.body();
+
+                        isRequestImage = false;
+
+                        if (body != null && body.isValid()) {
+
+                        }
+                        else {
+
+                            String message = getErrorMessage(response);
+                            if (message != null) {
+                                //showToastMessage(message);
+
+                                showErrorMessage(message);
+
+                            }else{
+                                showToastMessage("Face não autenticada");
+
+                            }
+
+
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<LivenessResponse> call, Throwable t) {
+                        if (DEBUG) Log.d(TAG, "ERRO: " + t.toString());
+                        dialog.dismiss();
+                        dialog.dismiss();
+
+                    }
+                });
+
+    }
+
+    private String verifyNullStringRequest (String string) {
+
+        if(string == null || string.length() == 0) {
+            string = "NÃO INFORMADO";
+        }
+
+        return string;
     }
 
     private ByteBuffer convertBitmapToByteBuffer(Bitmap pBitmap) {
@@ -1323,84 +1473,43 @@ public class SelfieActivityHomolog extends Camera2BaseHomolog implements ImagePr
 
 
 
-    private void faceInsert(String base64, String processId) {
-
-        try {
-
-            byte[] imageAsBytes = Base64.decode(base64.getBytes(), Base64.DEFAULT);
-
-            Bitmap bitmap = BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length);
-            ByteBuffer byteBuffer = convertBitmapToByteBuffer(bitmap);
-
-            if(quant){
-                byte[][] result = new byte[1][2];
-                tflite.run(byteBuffer, result);
-                System.out.println(result);;
-            } else {
-                float [][] result = new float[1][2];
-                tflite.run(byteBuffer, result);
-                System.out.println(result);
-
-            }
-
-
-//            String[] inputs = {"fotoboa", "fotodefoto"};
-//
-//            float[][] labelProbArray = new float[1][inputs.length];
-//
-//            float[] x = convertByteToInt(imageAsBytes);
-//            tflite.run(x, labelProbArray);
-
-        }catch (Exception e) {
-            System.out.println(e);
-        }
-
+    private void faceInsertClose(String base64, String processId) {
 
         FaceInsertRequest request = new FaceInsertRequest();
         request.setImagebase64(base64);
-        request.setValidateLiveness(Hawk.get(SharedKey.LIVENESS, true));
+        request.setValidateLiveness(true);
 
         // Face Insert  ----------------------
         ServiceGenerator
-                .createService(BioService.class)
+                .createService(BioService.class, false, true, ServiceGenerator.API_BASE_URL_HML)
                 .faceInsert(processId, request)
                 .enqueue(new Callback<FaceInsertResponse>() {
 
                     @Override
                     public void onResponse(Call<FaceInsertResponse> call, Response<FaceInsertResponse> response) {
+
                         FaceInsertResponse body = response.body();
 
-                        isRequestImage = false;
-
                         if (body != null && body.isValid()) {
-
-                            Hawk.delete(SharedKey.PROCESS);
-                            executeProcess(processId);
-
                         }
                         else {
 
-
-                            countDownCancelled[0] = Boolean.FALSE;
-                            isRequestImage = false;
-
-                            dialog.dismiss();
-
-
-
                             String message = getErrorMessage(response);
+                            Integer code = getResponseCode(response);
+                            biometryCodeClose = code;
+
                             if (message != null) {
                                 //showToastMessage(message);
-
-                                showErrorMessage(message);
-
+                                     biometryMessageClose = message;
                             }else{
                                 showToastMessage("Face não autenticada");
-
                             }
 
-
                         }
+
+                        faceInsertAfar(base64Afar, processId);
+
+
                     }
 
                     @Override
@@ -1416,8 +1525,64 @@ public class SelfieActivityHomolog extends Camera2BaseHomolog implements ImagePr
                 });
     }
 
+    private void faceInsertAfar(String base64, String processId) {
 
-    public void executeProcess (String processId) {
+        FaceInsertRequest request = new FaceInsertRequest();
+        request.setImagebase64(base64);
+        request.setValidateLiveness(true);
+
+        // Face Insert  ----------------------
+        ServiceGenerator
+                .createService(BioService.class, false, true, ServiceGenerator.API_BASE_URL_HML)
+                .faceInsert(processId, request)
+                .enqueue(new Callback<FaceInsertResponse>() {
+
+                    @Override
+                    public void onResponse(Call<FaceInsertResponse> call, Response<FaceInsertResponse> response) {
+
+                        FaceInsertResponse body = response.body();
+
+                        if (body != null && body.isValid()) {
+
+
+                        }
+                        else {
+
+                            String message = getErrorMessage(response);
+                            Integer code = getResponseCode(response);
+                            biometryCodeAfar = code;
+
+                            if (message != null) {
+                                //showToastMessage(message);
+                                biometryMessageAfar = message;
+
+                            }else{
+                                showToastMessage("Face não autenticada");
+
+                            }
+
+                        }
+
+                        sendRequestLiveness();
+
+                    }
+
+                    @Override
+                    public void onFailure(Call<FaceInsertResponse> call, Throwable t) {
+                        if (DEBUG) Log.d(TAG, "ERRO: " + t.toString());
+                        dialog.dismiss();
+                        isRequestImage = false;
+                        showSnackbarError("Falha ao inserir face. " + t.getMessage());
+                        reopenCamera();
+                        dialog.dismiss();
+
+                    }
+                });
+
+    }
+
+
+        public void executeProcess (String processId) {
 
         // Execute Process  ----------------------
         ServiceGenerator
@@ -1584,6 +1749,39 @@ public class SelfieActivityHomolog extends Camera2BaseHomolog implements ImagePr
         } catch (Exception ex) {
             Log.d(TAG, ex.toString());
         }
+    }
+
+
+    /** Returns the consumer friendly device name */
+    public static String getDeviceName() {
+        String manufacturer = Build.MANUFACTURER;
+        String model = Build.MODEL;
+        if (model.startsWith(manufacturer)) {
+            return capitalize(model);
+        }
+        return capitalize(manufacturer) + " " + model;
+    }
+
+    private static String capitalize(String str) {
+        if (TextUtils.isEmpty(str)) {
+            return str;
+        }
+        char[] arr = str.toCharArray();
+        boolean capitalizeNext = true;
+
+        StringBuilder phrase = new StringBuilder();
+        for (char c : arr) {
+            if (capitalizeNext && Character.isLetter(c)) {
+                phrase.append(Character.toUpperCase(c));
+                capitalizeNext = false;
+                continue;
+            } else if (Character.isWhitespace(c)) {
+                capitalizeNext = true;
+            }
+            phrase.append(c);
+        }
+
+        return phrase.toString();
     }
 
 }

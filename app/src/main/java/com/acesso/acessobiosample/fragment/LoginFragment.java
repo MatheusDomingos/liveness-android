@@ -148,7 +148,7 @@ public class LoginFragment extends CustomFragment {
 
 
         ServiceGenerator
-                .createService(BioService.class, true, urlInstance)
+                .createService(BioService.class, true, false,  urlInstance)
                 .getAuthToken()
                 .enqueue(new Callback<GetAuthTokenResponse>() {
 

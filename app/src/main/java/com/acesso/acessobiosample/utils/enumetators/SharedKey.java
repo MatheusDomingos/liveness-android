@@ -2,6 +2,9 @@ package com.acesso.acessobiosample.utils.enumetators;
 
 public interface SharedKey {
     String AUTH_TOKEN = "AUTH_TOKEN";
+
+    String AUTH_TOKEN_PANTHER= "AUTH_TOKEN";
+
     String RENEW_AUTH_TOKEN = "RENEW_AUTH_TOKEN";
     String INSTANCE = "INSTANCE";
     String CPF = "CPF";

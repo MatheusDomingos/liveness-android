@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.acesso.acessobiosample.dto.GetAuthTokenResponse;
 import com.acesso.acessobiosample.fragment.WelcomeFragment;
+import com.acesso.acessobiosample.services.AuthenticationInterceptor;
 import com.acesso.acessobiosample.services.BioService;
 import com.acesso.acessobiosample.services.ServiceGenerator;
 import com.crashlytics.android.Crashlytics;
@@ -74,9 +75,8 @@ public class SplashActivity extends AppCompatActivity {
         Hawk.put(SharedKey.NAME, "ADMIN");
         Hawk.put(SharedKey.PASSWORD, "Ac3ss0#66");
 
-
         ServiceGenerator
-                .createService(BioService.class, true, "https://www2.acesso.io/seres/services/v3/acessoservice.svc/")
+                .createService(BioService.class, true, false, "https://www2.acesso.io/seres/services/v3/acessoservice.svc/")
                 .getAuthToken()
                 .enqueue(new Callback<GetAuthTokenResponse>() {
 
@@ -88,12 +88,46 @@ public class SplashActivity extends AppCompatActivity {
                         if (body != null && body.isValid()) {
 
                             Hawk.put(SharedKey.AUTH_TOKEN, body.getToken());
+                            getAuthTokenBlackPanther();
+
 
                             Intent intent;
                             intent = new Intent(SplashActivity.this, SimpleViewActivity.class);
                             intent.putExtra(CustomFragment.FRAGMENT, WelcomeFragment.class);
                             startActivity(intent);
                             overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                        }
+                        else {
+                            Log.d("SplashActivity",body != null ? body.getMessageError() : "Erro ao recuperar token");
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<GetAuthTokenResponse> call, Throwable t) {
+                        Log.d("SplashActivity",t.getMessage());
+                    }
+                });
+
+    }
+
+
+    private void getAuthTokenBlackPanther(){
+
+        Hawk.put(SharedKey.NAME, "ADMIN");
+        Hawk.put(SharedKey.PASSWORD, "Ac3ss0#66");
+
+        ServiceGenerator
+                .createService(BioService.class, true, true, "https://crediariohomolog.acesso.io/blackpanther/services/v3/acessoservice.svc/")
+                .getAuthToken()
+                .enqueue(new Callback<GetAuthTokenResponse>() {
+
+                    @Override
+                    public void onResponse(Call<GetAuthTokenResponse> call, Response<GetAuthTokenResponse> response) {
+
+                        GetAuthTokenResponse body = response.body();
+
+                        if (body != null && body.isValid()) {
+                            Hawk.put(SharedKey.AUTH_TOKEN_PANTHER, body.getToken());
                         }
                         else {
                             Log.d("SplashActivity",body != null ? body.getMessageError() : "Erro ao recuperar token");

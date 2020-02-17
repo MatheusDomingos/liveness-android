@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 public class LivenessResponse {
 
-    @SerializedName("LivenessResult")
+    @SerializedName("LivenessAppResult")
     private LivenessResult livenessResult;
 
     @SerializedName("Error")

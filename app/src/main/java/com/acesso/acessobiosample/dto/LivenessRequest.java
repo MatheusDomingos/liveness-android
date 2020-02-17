@@ -9,6 +9,8 @@ import lombok.Setter;
 @Setter
 public class LivenessRequest {
 
+
+
     @SerializedName("isLive")
     private Boolean isLIve;
 

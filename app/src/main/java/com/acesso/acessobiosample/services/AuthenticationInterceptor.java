@@ -12,11 +12,14 @@ import okhttp3.Response;
 public class AuthenticationInterceptor implements Interceptor {
 
     private static boolean auth = false;
+    private static boolean ispanther = false;
 
     private static final String API_KEY = "7e426bc2-652e-4bce-b6a1-7922fa44ebc9";
+    private static final String API_KEY_PANTHER = "f968978f-1417-4d11-8dc4-59477deb3d36";
 
-    public AuthenticationInterceptor(boolean auth) {
+    public AuthenticationInterceptor(boolean auth, boolean ispanther) {
         this.auth = auth;
+        this.ispanther = ispanther;
     }
 
     @Override
@@ -27,12 +30,23 @@ public class AuthenticationInterceptor implements Interceptor {
         Request.Builder builder = original.newBuilder();
 
         if (auth) {
-            builder.addHeader("APIKEY", API_KEY);
+            if(ispanther) {
+                builder.addHeader("APIKEY", API_KEY_PANTHER);
+            }else{
+                builder.addHeader("APIKEY", API_KEY);
+            }
             builder.addHeader("Login", Hawk.get(SharedKey.NAME));
             builder.addHeader("Password",Hawk.get(SharedKey.PASSWORD));
         } else {
-            builder.addHeader("APIKEY", API_KEY);
-            builder.addHeader("Authorization", Hawk.get(SharedKey.AUTH_TOKEN, ""));
+
+            if(ispanther) {
+                builder.addHeader("X-AcessoBio-APIKEY", API_KEY_PANTHER);
+                builder.addHeader("Authentication", Hawk.get(SharedKey.AUTH_TOKEN_PANTHER, ""));
+            }else{
+                builder.addHeader("APIKEY", API_KEY);
+                builder.addHeader("Authorization", Hawk.get(SharedKey.AUTH_TOKEN, ""));
+            }
+
         }
 
         Request request = builder.build();

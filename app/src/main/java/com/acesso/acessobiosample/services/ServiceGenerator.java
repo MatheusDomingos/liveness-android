@@ -1,5 +1,7 @@
 package com.acesso.acessobiosample.services;
 
+import android.text.style.ImageSpan;
+
 import com.acesso.acessobiosample.utils.enumetators.SharedKey;
 import com.orhanobut.hawk.Hawk;
 
@@ -30,20 +32,20 @@ public class ServiceGenerator {
     private static Retrofit retrofit = builder.build();
 
     public static <S> S createService(Class<S> serviceClass) {
-        return createService(serviceClass, false, API_BASE_URL_PRD);
+        return createService(serviceClass, false, false,  API_BASE_URL_PRD);
     }
 
     public static <S> S createService(Class<S> serviceClass, String instanceURL) {
-        return createService(serviceClass, false, instanceURL);
+        return createService(serviceClass, false, false, instanceURL);
     }
 
-    public static <S> S createService(Class<S> serviceClass, boolean auth, String url) {
+    public static <S> S createService(Class<S> serviceClass, boolean auth, boolean ispanther, String url) {
 
         builder = new Retrofit.Builder()
                 .baseUrl(url)
                 .addConverterFactory(GsonConverterFactory.create());
 
-        AuthenticationInterceptor interceptor = new AuthenticationInterceptor(auth);
+        AuthenticationInterceptor interceptor = new AuthenticationInterceptor(auth, ispanther);
 
         httpClientBuilder.protocols(protocols);
 

@@ -170,7 +170,7 @@ public class HomeFragment extends CustomFragment {
 
 
         ServiceGenerator
-                .createService(BioService.class, true, Hawk.get(SharedKey.INSTANCE))
+                .createService(BioService.class, true, false,  Hawk.get(SharedKey.INSTANCE))
                 .getAuthToken()
                 .enqueue(new Callback<GetAuthTokenResponse>() {
 
