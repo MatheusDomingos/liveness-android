@@ -20,6 +20,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.acesso.acessobiosample.R;
+import com.acesso.acessobiosample.activity.SimpleViewActivity;
 import com.acesso.acessobiosample.dto.CreateProcessRequest;
 import com.acesso.acessobiosample.dto.CreateProcessResponse;
 import com.acesso.acessobiosample.dto.Subject;
@@ -70,10 +71,8 @@ public class NewProcessFragment extends CustomFragment {
         btCreate = (Button) view.findViewById(R.id.btCreate);
 
 
-
         MaskEditTextChangedListener maskCPF = new MaskEditTextChangedListener("###.###.###-##", etCPF);
         etCPF.addTextChangedListener(maskCPF);
-
 
         etNome.setText("Matheus Domingos");
         etCPF.setText("098.703.609-20");
@@ -90,79 +89,21 @@ public class NewProcessFragment extends CustomFragment {
             @Override
             public void onClick(View v) {
 
-
                 if (validateForm()) {
 
                     String cpf = etCPF.getText().toString();
                     cpf = cpf.replaceAll("\\.", "");
                     cpf = cpf.replaceAll("-", "");
 
-                    CreateProcessRequest request = new CreateProcessRequest();
-                    Subject subject = new Subject();
-                    subject.setCode(cpf);
-                    subject.setGender(gender);
-                    subject.setName(etNome.getText().toString());
+                    Hawk.put(SharedKey.USER_NAME, etNome.getText().toString());
+                    Hawk.put(SharedKey.USER_DOCUMENT, cpf);
+                    Hawk.put(SharedKey.USER_GENDER, gender);
 
-                    request.setSubject(subject);
+                    Intent intent = new Intent(getActivity(), SimpleViewActivity.class);
+                    intent.putExtra(CustomFragment.FRAGMENT, IntroFragment.class);
+                    startActivity(intent);
+                    getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
 
-                    // Create Process
-                    ServiceGenerator
-                            .createService(BioService.class)
-                            .createProcess("1", request)
-                            .enqueue(new Callback<CreateProcessResponse>() {
-
-                                @Override
-                                public void onResponse(Call<CreateProcessResponse> call, Response<CreateProcessResponse> response) {
-                                    CreateProcessResponse body = response.body();
-
-                                    if (body != null && body.isValid()) {
-
-                                        // define o processo
-                                        String processId = body.getCreateProcessResult().getProcess().getId();
-                                        Hawk.put(SharedKey.PROCESS, processId);
-
-//                                        Intent intent = new Intent(getActivity(), SelfieActivity.class);
-//                                        startActivity(intent);
-
-                                    } else {
-
-                                        try {
-                                            JSONObject j = new JSONObject(response.errorBody().string());
-                                            JSONObject error = j.getJSONObject("Error");
-                                            String message = error.getString("Description");
-
-                                            new SweetAlertDialog(getContext(), SweetAlertDialog.WARNING_TYPE)
-                                                    .setTitleText("Ops!")
-                                                    .setContentText(message)
-                                                    .setConfirmText("Entendi")
-                                                    .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                                                @Override
-                                                public void onClick(SweetAlertDialog sDialog) {
-
-                                                    sDialog.dismissWithAnimation();
-
-                                                }
-                                            }).show();
-
-                                        } catch (Exception ex) {
-
-                                            if (!showSnackbarError(response)) {
-                                                showSnackbarError(body != null ? body.getMessageError() : "Erro ao criar registro");
-                                            }
-
-                                            Log.d(TAG, ex.getMessage());
-                                        }
-
-
-                                    }
-                                }
-
-                                @Override
-                                public void onFailure(Call<CreateProcessResponse> call, Throwable t) {
-                                    Log.d(TAG, t.getMessage());
-                                    showSnackbarError(t.getMessage());
-                                }
-                            });
                 }
 
             }

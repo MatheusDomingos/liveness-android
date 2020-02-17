@@ -9,10 +9,11 @@ public interface SharedKey {
     String NAME = "NAME";
     String PASSWORD = "PASSWORD";
 
-
-    String EMAIL = "EMAIL";
+    String USER_EMAIL = "USER_EMAIL";
+    String USER_DOCUMENT = "USER_DOCUMENT";
+    String USER_NAME = "USER_NAME";
     String PHONE = "PHONE";
-    String GENDER = "GENDER";
+    String USER_GENDER = "USER_GENDER";
     String PHOTO_URI = "PHOTO_URI";
     String PROCESS = "PROCESS";
     String GLASSES = "GLASSES";

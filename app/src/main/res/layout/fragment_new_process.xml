@@ -19,12 +19,12 @@
             android:id="@+id/tvNome"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Novo cadastro"
-            android:textColor="@color/colorGreyDark"
-            android:textSize="40sp"
+            android:text="Informe seus dados"
+            android:textColor="@color/colorIntroTitle"
+            android:textSize="30sp"
             android:layout_marginBottom="10dp"
             android:layout_marginStart="15dp"
-            android:paddingTop="20dp"
+            android:paddingTop="30dp"
             android:textStyle="bold"/>
 
 
@@ -107,8 +107,8 @@
                 android:id="@+id/btCreate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Criar"
-                android:background="@color/colorPrimary"
+                android:text="Pronto"
+                android:background="@drawable/button_background_rounded"
                 android:textColor="@android:color/white"
                 android:layout_marginTop="10dp"
                 android:textAllCaps="false"

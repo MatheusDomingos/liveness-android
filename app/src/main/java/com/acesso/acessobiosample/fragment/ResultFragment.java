@@ -30,7 +30,7 @@ public class ResultFragment extends CustomFragment {
 
         Intent intent = getActivity().getIntent();
 
-        Boolean isLiveness = intent.getBooleanExtra("isLiveness", true);
+        boolean isLiveness = intent.getBooleanExtra("isLiveness", true);
 
         if(isLiveness) {
 
@@ -40,10 +40,10 @@ public class ResultFragment extends CustomFragment {
             Bitmap bitmapAfar = intent.getParcelableExtra("bitmapAfar");
 
             ImageView ivClose = ((ImageView) v.findViewById(R.id.ivClose));
-            ivClose.setImageBitmap(bitmapClose);
+            ivClose.setImageBitmap(bitmapAfar);
 
             ImageView ivAfar = ((ImageView) v.findViewById(R.id.ivAfar));
-            ivAfar.setImageBitmap(bitmapAfar);
+            ivAfar.setImageBitmap(bitmapClose);
 
             Button btExit = (Button)v.findViewById(R.id.btExit);
             Button btFeedback = (Button)v.findViewById(R.id.btFeedback);
@@ -67,7 +67,6 @@ public class ResultFragment extends CustomFragment {
                     intent.putExtra(Intent.EXTRA_TEXT, "" );
                     intent.putExtra(Intent.EXTRA_EMAIL, new String[]{"suportebio@acessodigital.com.br"});
                     startActivity(Intent.createChooser(intent, ""));
-
                 }
             });
 

@@ -44,7 +44,7 @@ public class WelcomeFragment extends CustomFragment{
             public void onClick(View v) {
 
                 Intent intent = new Intent(getActivity(), SimpleViewActivity.class);
-                intent.putExtra(CustomFragment.FRAGMENT, IntroFragment.class);
+                intent.putExtra(CustomFragment.FRAGMENT, NewProcessFragment.class);
                 startActivity(intent);
                 getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
 

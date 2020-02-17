@@ -67,6 +67,7 @@ import com.orhanobut.hawk.Hawk;
 
 import org.tensorflow.lite.Interpreter;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -1113,16 +1114,22 @@ public class SelfieActivityHomolog extends Camera2BaseHomolog implements ImagePr
                         Boolean IsLiveness = "1".equals(resultLiveness.get("isLiveness"));
 
 
-
                         Bitmap bitClose = Bitmap.createScaledBitmap(bitmapClose, 200, 280, false);
                         Bitmap bitAfar = Bitmap.createScaledBitmap(bitmapAfarSmiling, 200, 280, false);
 
+                        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                        bitClose.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+                        byte[] byteArrayClose = byteArrayOutputStream .toByteArray();
+
+                        ByteArrayOutputStream byteArrayOutputStreamAfar = new ByteArrayOutputStream();
+                        bitAfar.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStreamAfar);
+                        byte[] byteArrayAfar = byteArrayOutputStreamAfar.toByteArray();
 
 
                         HashMap<String, String> callBackResult = new HashMap<>();
                         callBackResult.put("isLiveness", resultLiveness.get("isLiveness"));
-                        callBackResult.put("base64", base64Afar);
-                        callBackResult.put("base64Close", base64Afar);
+                        callBackResult.put("base64", Base64.encodeToString(byteArrayClose, Base64.DEFAULT));
+                        callBackResult.put("base64Close", Base64.encodeToString(byteArrayAfar, Base64.DEFAULT));
 
                         Intent resultIntent = new Intent();
                         resultIntent.putExtra(LivenessXHomolog.RESULT_OK, callBackResult);
