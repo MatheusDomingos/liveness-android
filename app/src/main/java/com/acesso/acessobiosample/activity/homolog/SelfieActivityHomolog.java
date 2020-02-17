@@ -251,7 +251,6 @@ public class SelfieActivityHomolog extends Camera2BaseHomolog implements ImagePr
     private boolean countDownSmileStarted = false;
     CountDownTimer countDownUserBehavior;
 
-
     // Billing
     private String urlInstance, apikey, authToken;
 
@@ -719,6 +718,7 @@ public class SelfieActivityHomolog extends Camera2BaseHomolog implements ImagePr
 
                 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
                 public void onFinish() {
+                    destroyTimer();
                     destroyTimerUserBehavior();
                     currentFlow = Flow.RESET;
                     changeTheFlow();
@@ -883,7 +883,7 @@ public class SelfieActivityHomolog extends Camera2BaseHomolog implements ImagePr
         Arrays.sort(floatBlink, 0, floatBlink.length);
 
         if(floatBlink[floatBlink.length - 1] > 0.8f &&
-                floatBlink[0] < 0.5f && floatBlink[1] < 0.5f && floatBlink[2] < 0.5f){
+                floatBlink[0] < 0.5f && floatBlink[1] < 0.5f){
             return true;
         }else{
             return false;
