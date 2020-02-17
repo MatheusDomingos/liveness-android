@@ -807,6 +807,7 @@ public class SelfieActivityHomolog extends Camera2BaseHomolog implements ImagePr
         }
 
         @ColorInt Integer  colorGreen = ResourcesCompat.getColor(getResources(), R.color.colorGreenMaskBorder, null) ;
+        @ColorInt Integer  colorGreenTvStatus = ResourcesCompat.getColor(getResources(), R.color.colorGreen, null) ;
 
         if(!currentColorBorder.equals(colorGreen)) {
             currentColorBorder = colorGreen;
@@ -814,7 +815,7 @@ public class SelfieActivityHomolog extends Camera2BaseHomolog implements ImagePr
 
             //
             if(currentFlow == Flow.SMILE) {
-                tvStatus.setTextColor(colorGreen);
+                tvStatus.setTextColor(colorGreenTvStatus);
                 if(isEnterSmiling) {
                     tvStatus.setText(getString(R.string.status_stop_smile));
                 }else{
@@ -1107,7 +1108,7 @@ public class SelfieActivityHomolog extends Camera2BaseHomolog implements ImagePr
             tvStatus.setText(getString(R.string.status_smile));
         }
 
-        tvStatus.setTextColor( ResourcesCompat.getColor(getResources(), R.color.colorGreenMaskBorder, null));
+        tvStatus.setTextColor( ResourcesCompat.getColor(getResources(), R.color.colorGreen, null));
     }
 
     @Override
@@ -1321,12 +1322,12 @@ public class SelfieActivityHomolog extends Camera2BaseHomolog implements ImagePr
 
     }
 
-    private void sendRequestLiveness () {
+    private void sendRequestLiveness (String processID) {
 
         Float Score = Float.valueOf(resultLiveness.get("Score"));
         Boolean IsLiveness = "1".equals(resultLiveness.get("isLiveness"));
-        Boolean LivenessClose = "1".equals(resultLiveness.get("isLiveClose"));
-        Boolean LivenessAway = "1".equals(resultLiveness.get("isLiveAway"));
+        Boolean LivenessClose = "true".equals(resultLiveness.get("isLiveClose"));
+        Boolean LivenessAway = "true".equals(resultLiveness.get("isLiveAway"));
         Float ScoreClose = Float.valueOf(resultLiveness.get("ScoreClose"));
         Float ScoreAway = Float.valueOf(resultLiveness.get("ScoreAway"));
         Integer Time = Integer.valueOf(resultLiveness.get("Time"));
@@ -1375,7 +1376,7 @@ public class SelfieActivityHomolog extends Camera2BaseHomolog implements ImagePr
 
         ServiceGenerator
                 .createService(BioService.class, false, true, "https://crediariohomolog.acesso.io/blackpanther/services/v2/credService.svc/")
-                .liveness("24036E73-64A1-498E-8824-67BC99F81AB3", livenessRequestSample)
+                .liveness(processID, livenessRequestSample)
                 .enqueue(new Callback<LivenessResponse>() {
 
                     @Override
@@ -1565,7 +1566,7 @@ public class SelfieActivityHomolog extends Camera2BaseHomolog implements ImagePr
 
                         }
 
-                        sendRequestLiveness();
+                        sendRequestLiveness(processId);
 
                     }
 
