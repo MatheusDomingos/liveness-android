@@ -43,8 +43,8 @@ import retrofit2.Response;
  */
 public class NewProcessFragment extends CustomFragment {
 
-    private EditText etNome, etCPF, etSexo;
-    private Button btSexo, btCreate;
+    private EditText etNome, etCPF;
+    private Button btCreate;
     private String gender;
 
     protected static final int REQUEST_CAMERA_PERMISSION = 1;
@@ -66,24 +66,11 @@ public class NewProcessFragment extends CustomFragment {
 //
         etNome = (EditText) view.findViewById(R.id.etNome);
         etCPF = (EditText) view.findViewById(R.id.etCPF);
-        etSexo = (EditText) view.findViewById(R.id.etSexo);
-        btSexo = (Button) view.findViewById(R.id.btSexo);
         btCreate = (Button) view.findViewById(R.id.btCreate);
 
 
         MaskEditTextChangedListener maskCPF = new MaskEditTextChangedListener("###.###.###-##", etCPF);
         etCPF.addTextChangedListener(maskCPF);
-
-        etNome.setText("Matheus Domingos");
-        etCPF.setText("098.703.609-20");
-        etSexo.setText("Masculino");
-
-        btSexo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showDialogGenders();
-            }
-        });
 
         btCreate.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -103,7 +90,6 @@ public class NewProcessFragment extends CustomFragment {
                     intent.putExtra(CustomFragment.FRAGMENT, IntroFragment.class);
                     startActivity(intent);
                     getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-
                 }
 
             }
@@ -116,8 +102,6 @@ public class NewProcessFragment extends CustomFragment {
                     switch (keyCode) {
                         case KeyEvent.KEYCODE_DPAD_CENTER:
                         case KeyEvent.KEYCODE_ENTER:
-
-                            showDialogGenders();
                             return true;
                         default:
                             break;
@@ -145,30 +129,6 @@ public class NewProcessFragment extends CustomFragment {
             }, REQUEST_CAMERA_PERMISSION);
             return;
         }
-    }
-
-
-
-    public void showDialogGenders() {
-
-        final String[] genders = {"Masculino", "Feminino"};
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("Selecione o sexo");
-        builder.setItems(genders, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                    etSexo.setText(genders[which]);
-                    if(which == 0) {
-                        gender = "M";
-                    }else {
-                        gender = "F";
-                    }
-            }
-        });
-
-        builder.show();
-
     }
 
 

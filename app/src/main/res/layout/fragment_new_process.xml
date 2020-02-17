@@ -21,9 +21,9 @@
             android:layout_height="wrap_content"
             android:text="Informe seus dados"
             android:textColor="@color/colorIntroTitle"
-            android:textSize="30sp"
+            android:textSize="22sp"
             android:layout_marginBottom="10dp"
-            android:layout_marginStart="15dp"
+            android:layout_marginStart="23dp"
             android:paddingTop="30dp"
             android:textStyle="bold"/>
 
@@ -41,61 +41,32 @@
                 android:id="@+id/etNome"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:backgroundTint="@color/colorPrimary"
                 android:hint="Nome"
-                android:textColorHint="@color/colorGray"
-                android:textColor="@color/colorGreyDark"
+                android:inputType="textCapWords"
                 android:lines="1"
                 android:maxLines="1"
-                android:inputType="textCapWords"
-                android:textSize="15sp"
                 android:paddingTop="15dp"
                 android:paddingBottom="15dp"
-                />
+                android:textColor="@color/colorGreyDark"
+                android:textColorHint="@color/colorGray"
+                android:textSize="15sp" />
 
-                <EditText
-                    android:id="@+id/etCPF"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="CPF"
-                    android:textColorHint="@color/colorGray"
-                    android:textColor="@color/colorGreyDark"
-                    android:paddingRight="60dp"
-                    android:lines="1"
-                    android:maxLines="1"
-                    android:inputType="numberDecimal"
-                    android:textSize="15sp"
-                    android:paddingTop="15dp"
-                    android:paddingBottom="15dp"
-                    />
-
-            <RelativeLayout
+            <EditText
+                android:id="@+id/etCPF"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <EditText
-                    android:id="@+id/etSexo"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Sexo"
-                    android:textColorHint="@color/colorGray"
-                    android:textColor="@color/colorGreyDark"
-                    android:paddingRight="60dp"
-                    android:lines="1"
-                    android:maxLines="1"
-                    android:textSize="15sp"
-                    android:paddingTop="15dp"
-                    android:paddingBottom="15dp"
-                    android:imeOptions="actionGo"
-                    android:editable="false"
-                    tools:ignore="Deprecated" />
-
-                <Button
-                    android:id="@+id/btSexo"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@color/transparent"/>
-
-            </RelativeLayout>
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/colorPrimary"
+                android:hint="CPF"
+                android:inputType="numberDecimal"
+                android:lines="1"
+                android:maxLines="1"
+                android:paddingTop="15dp"
+                android:paddingRight="60dp"
+                android:paddingBottom="15dp"
+                android:textColor="@color/colorGreyDark"
+                android:textColorHint="@color/colorGray"
+                android:textSize="15sp" />
 
             <!--<com.facebook.login.widget.LoginButton-->
                 <!--android:id="@+id/bt_acessar_fb"-->
@@ -107,12 +78,13 @@
                 android:id="@+id/btCreate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:height="50dp"
                 android:text="Pronto"
                 android:background="@drawable/button_background_rounded"
                 android:textColor="@android:color/white"
                 android:layout_marginTop="10dp"
                 android:textAllCaps="false"
-                android:textSize="17sp"
+                android:textSize="16sp"
                 />
 
 
