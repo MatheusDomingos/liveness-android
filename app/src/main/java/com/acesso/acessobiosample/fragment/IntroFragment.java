@@ -73,7 +73,6 @@ public class IntroFragment extends CustomFragment implements iLivenessXHomolog {
 
                 if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
                 {
-
                     requestPermissions(new String[] {
                             Manifest.permission.CAMERA
                     }, REQUEST_CAMERA_PERMISSION);

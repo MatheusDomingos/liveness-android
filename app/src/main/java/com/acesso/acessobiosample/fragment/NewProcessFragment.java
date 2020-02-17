@@ -115,21 +115,6 @@ public class NewProcessFragment extends CustomFragment {
         return view;
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
-        {
-            ActivityCompat.requestPermissions(getActivity(), new String[] {
-                    Manifest.permission.CAMERA,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE
-            }, REQUEST_CAMERA_PERMISSION);
-            return;
-        }
-    }
-
-
     public boolean validateForm() {
         boolean valid = true;
         View focusView = null;
