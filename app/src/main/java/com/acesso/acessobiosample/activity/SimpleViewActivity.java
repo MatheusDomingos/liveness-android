@@ -3,12 +3,16 @@ package com.acesso.acessobiosample.activity;
 import android.content.Intent;
 import android.os.Bundle;
 
+import android.util.Log;
 import android.view.WindowManager;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.acesso.acessobiosample.R;
+import com.acesso.acessobiosample.support.LivenessXHomolog;
+
+import java.util.HashMap;
 
 /**
  * Created by matheusdomingos on 18/05/17.

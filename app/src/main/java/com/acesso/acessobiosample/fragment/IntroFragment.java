@@ -7,8 +7,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.Image;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -151,8 +154,26 @@ public class IntroFragment extends CustomFragment implements iLivenessXHomolog {
         if(requestCode == LivenessXHomolog.REQUEST_LIVENESS) {
             if (resultCode == Activity.RESULT_OK) {
                 assert data != null;
-                HashMap<String, String> result = data.getParcelableExtra(LivenessXHomolog.RESULT_OK);
-                Log.d(TAG, result.get("result"));
+                Intent intent = data;
+                HashMap<String, String> result = (HashMap<String, String>)intent.getSerializableExtra(LivenessXHomolog.RESULT_OK);
+
+                byte[] decodedString = Base64.decode(result.get("base64"), Base64.DEFAULT);
+                Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+
+                byte[] decodedStringClose = Base64.decode(result.get("base64Close"), Base64.DEFAULT);
+                Bitmap decodedByteClose = BitmapFactory.decodeByteArray(decodedStringClose, 0, decodedStringClose.length);
+
+                Bitmap bitClose = Bitmap.createScaledBitmap(decodedByteClose, 200, 280, false);
+                Bitmap bitAfar = Bitmap.createScaledBitmap(decodedByte, 200, 280, false);
+
+                Intent intentResult = new Intent(getActivity(), SimpleViewActivity.class);
+                intentResult.putExtra(CustomFragment.FRAGMENT, ResultFragment.class);
+                intentResult.putExtra("isLiveness", result.get("isLiveness"));
+                intentResult.putExtra("bitmapClose", bitClose);
+                intentResult.putExtra("bitmapAfar", bitAfar);
+                startActivity(intentResult);
+
+
                 // TODO Update your TextView.
             }
         }

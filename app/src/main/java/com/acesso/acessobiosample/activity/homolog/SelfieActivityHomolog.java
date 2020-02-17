@@ -1117,13 +1117,17 @@ public class SelfieActivityHomolog extends Camera2BaseHomolog implements ImagePr
                         Bitmap bitClose = Bitmap.createScaledBitmap(bitmapClose, 200, 280, false);
                         Bitmap bitAfar = Bitmap.createScaledBitmap(bitmapAfarSmiling, 200, 280, false);
 
+
+
                         HashMap<String, String> callBackResult = new HashMap<>();
                         callBackResult.put("isLiveness", resultLiveness.get("isLiveness"));
                         callBackResult.put("base64", base64Afar);
+                        callBackResult.put("base64Close", base64Afar);
 
                         Intent resultIntent = new Intent();
                         resultIntent.putExtra(LivenessXHomolog.RESULT_OK, callBackResult);
-                        setResult(Activity.RESULT_OK, resultIntent);
+                      //  resultIntent.putExtra(LivenessXHomolog.RESULT_OK, "1");
+                        SelfieActivityHomolog.this.setResult(Activity.RESULT_OK, resultIntent);
                         finish();
 
 
@@ -1131,8 +1135,7 @@ public class SelfieActivityHomolog extends Camera2BaseHomolog implements ImagePr
                         //result.put("bitmapAfar", base64Afar);
 
                       /*
-                        Bitmap bitClose = Bitmap.createScaledBitmap(bitmapClose, 200, 280, false);
-                        Bitmap bitAfar = Bitmap.createScaledBitmap(bitmapAfarSmiling, 200, 280, false);
+
 
                         Intent intent = new Intent(SelfieActivity.this, SimpleViewActivity.class);
                         intent.putExtra(CustomFragment.FRAGMENT, ResultFragment.class);
